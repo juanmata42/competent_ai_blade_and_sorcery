@@ -38,7 +38,7 @@ Todo lo de integración está sin ejecutar. IK de una mano, esquiva lateral y el
 3. Candidatos a v0.2: selección de guardia por clase de golpe (usar `Zones` para elegir/forzar la pose), esquiva direccional según el corte entrante, ataques de escudo reactivos, integración con un pack de animaciones con cortes verticales.
 
 ## Revisión independiente del código (hecha)
-Un subagente revisó el código de integración contra el del juego (12 hallazgos, sin cuelgues garantizados pero 1 de severidad alta). **Todos corregidos** salvo: 3 tests de la integración (`StanceCurator`, `BrainModuleCompetent`) que no se pueden ejecutar fuera de Unity (riesgo cubierto por logs y TESTING.md) y el test del manifest, que solo comprueba coherencia interna (la verificación real de `GameVersion=1.0.0.0` está en `game-ai-internals.md §5`). Detalle en CHANGELOG.
+Un subagente revisó el código de integración contra el del juego (12 hallazgos, sin cuelgues garantizados pero 1 de severidad alta). **Los 12 hallazgos de código están corregidos.** Siguen sin cobertura de tests la `StanceCurator` y el `BrainModuleCompetent`, que no se pueden ejecutar fuera de Unity (riesgo cubierto por logs y TESTING.md). Además, el test del manifest solo comprueba coherencia interna (la verificación real de `GameVersion=1.0.0.0` está en `game-ai-internals.md §5`). Detalle en CHANGELOG.
 
 ## Registro de cambios de proceso
-- 2026-10-12: Fase 0 → Fase 1 → … → 4 ejecutadas de una tacada por mandato del usuario. Revisión independiente del código de integración encargada a un subagente (ver sección siguiente cuando termine).
+- 2026-10-12: Fase 0 → Fase 1 → … → 4 ejecutadas de una tacada por mandato del usuario. Revisión independiente del código de integración hecha por un subagente (ver sección anterior).
