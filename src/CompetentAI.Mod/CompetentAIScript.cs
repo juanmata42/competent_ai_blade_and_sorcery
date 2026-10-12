@@ -143,7 +143,7 @@ namespace CompetentAI.Mod
         private static void OnLevelUnload(LevelData levelData, LevelData.Mode mode, EventTime eventTime)
         {
             if (eventTime != EventTime.OnEnd) return;
-            Runtime.Modules.Clear();
+            Runtime.PruneDeadCreatures(); // creatures that survive the unload keep their registration
             WeaponInspector.ClearCache();
             Runtime.SaveCalibrationIfDirty();
         }

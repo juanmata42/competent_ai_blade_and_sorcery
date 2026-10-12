@@ -53,7 +53,7 @@
 | `Variety.SameDirectionPenalty` | 0.45 | 0.01 … 1 | Weight factor when the candidate travels the same direction as a remembered attack. |
 | `Variety.NeighbourDirectionPenalty` | 0.8 | 0.01 … 1 | Weight factor when the candidate is only one 45° step away from a remembered direction. |
 | `Variety.NoveltyBonus` | 1.4 | 1 … 4 | Bonus when the candidate's direction does not appear in memory at all. |
-| `Variety.NonPlannedWeight` | 0.04 | 0 … 1 | Weight given to every candidate that is NOT the planned one when the director steers the pick. 1 = no steering, 0 = only the planned attack can be chosen.  |
+| `Variety.NonPlannedWeight` | 0.04 | 0.01 … 1 | Weight given to every candidate that is NOT the planned one when the director steers the pick. 1 = no steering, 0 = only the planned attack can be chosen.  |
 
 ## Feints
 

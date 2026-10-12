@@ -13,6 +13,7 @@ namespace CompetentAI.Mod
         private bool _wasDodging;
         private bool _fatigueApplied;
         private float _lastDangerTime;
+        private float _lastParryEvent = -10f;
 
         /// <summary>
         /// Runs right after the stock defence module in the same fixed step. Three jobs:
@@ -28,17 +29,18 @@ namespace CompetentAI.Mod
             // 1) fatigue gate on parrying
             if (reading && _fatigue.IsOverwhelmed(now))
             {
+                // The behaviour tree rewrites parryEnabled every AI cycle (SetDefenseState), so keep asserting it.
                 if (!_fatigueApplied)
                 {
                     _fatigueApplied = true;
-                    _defense.parryEnabled = false;
                     Log.Defense($"{_tag} overwhelmed: parry disabled for a moment");
                 }
+                _defense.parryEnabled = false;
             }
             else if (_fatigueApplied)
             {
                 _fatigueApplied = false;
-                _defense.parryEnabled = _origCaptured ? _orig.parryEnabled : true;
+                if (!_defense.parryEnabled) _defense.parryEnabled = _origCaptured ? _orig.parryEnabled : true;
             }
 
             // 3) dodge end → counter window
@@ -61,8 +63,9 @@ namespace CompetentAI.Mod
                     (info.parryTarget == null || _detection.attackInfoLeft.targetPointVelocity.sqrMagnitude > info.targetPointVelocity.sqrMagnitude))
                     info = _detection.attackInfoLeft;
 
+                Vector3 toDefender = creature.transform.position - info.targetPoint;
                 if (info.parryTarget != null &&
-                    _tracker.Update(now, ToVec(info.targetPointVelocity), Runtime.Cfg.Defense, out float angle))
+                    _tracker.Update(now, ToVec(info.targetPointVelocity), ToVec(toDefender), Runtime.Cfg.Defense, out float angle))
                 {
                     FeintOutcome outcome = _reader.OnReversal(now);
                     Log.Defense($"{_tag} strike changed direction by {angle:0}° -> {outcome}");
@@ -88,7 +91,10 @@ namespace CompetentAI.Mod
             if (!_loaded || _disabled || !Runtime.Flags.Enabled || !Runtime.Flags.DefenseReading) return;
             try
             {
-                if (_fatigue.RegisterParry(Time.time))
+                float t = Time.time;
+                if (t - _lastParryEvent < 0.15f) return; // one parry raises several collision events
+                _lastParryEvent = t;
+                if (_fatigue.RegisterParry(t))
                     Log.Defense($"{_tag} has parried too much in a short time (fatigue)");
             }
             catch (Exception ex)

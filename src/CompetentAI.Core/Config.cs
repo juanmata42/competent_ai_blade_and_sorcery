@@ -242,7 +242,7 @@ namespace CompetentAI.Core
             Variety.SameDirectionPenalty = Clamp(Variety.SameDirectionPenalty, 0.01f, 1f);
             Variety.NeighbourDirectionPenalty = Clamp(Variety.NeighbourDirectionPenalty, 0.01f, 1f);
             Variety.NoveltyBonus = Clamp(Variety.NoveltyBonus, 1f, 4f);
-            Variety.NonPlannedWeight = Clamp(Variety.NonPlannedWeight, 0f, 1f);
+            Variety.NonPlannedWeight = Clamp(Variety.NonPlannedWeight, 0.01f, 1f);
 
             Feints.MinWindowSeconds = Clamp(Feints.MinWindowSeconds, 0.1f, 2f);
             Feints.CancelFractionMin = Clamp(Feints.CancelFractionMin, 0.1f, 0.9f);

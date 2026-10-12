@@ -16,6 +16,7 @@ namespace CompetentAI.Core.Tests
         [InlineData(1f, -1f, 0f, CutDirection.DownRight)]
         [InlineData(0f, 0f, 1f, CutDirection.Thrust)]
         [InlineData(0.2f, 0.1f, 1f, CutDirection.Thrust)]
+        [InlineData(0.6f, -0.6f, 0.8f, CutDirection.DownRight)]
         public void Classify_maps_motion_vectors_to_the_nine_directions(float x, float y, float z, CutDirection expected)
         {
             Assert.Equal(expected, Directions.Classify(new Vec3(x, y, z)));
@@ -30,8 +31,8 @@ namespace CompetentAI.Core.Tests
         [Fact]
         public void Motion_well_off_the_forward_axis_is_a_cut_and_close_to_it_is_a_thrust()
         {
-            Assert.Equal(CutDirection.Right, Directions.Classify(new Vec3(1f, 0f, 0.6f)));   // ~59 degrees off forward
-            Assert.Equal(CutDirection.Thrust, Directions.Classify(new Vec3(1f, 0f, 1f)));    // 45 degrees off forward
+            Assert.Equal(CutDirection.Right, Directions.Classify(new Vec3(1f, 0f, 1f)));     // 45 degrees off forward: a cut
+            Assert.Equal(CutDirection.Thrust, Directions.Classify(new Vec3(0.5f, 0f, 2f))); // ~14 degrees off forward: a thrust
         }
 
         [Fact]

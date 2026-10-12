@@ -30,13 +30,14 @@ namespace CompetentAI.Mod
         private bool _tunedSide;
         private float _baseAdjust;
         private bool _ikEnabledByMe;
+        private bool _ikFailed; // persistent: never retried for this creature, and not cleared by RestoreTuning
 
         /// <summary>Applies or removes the archetype tuning according to the current effective flags.</summary>
         private void SyncTuning(bool first)
         {
             EffectiveFlags f = Runtime.Flags;
             bool wantTuning = f.Enabled && f.ProfileTuning;
-            bool wantIk = wantTuning && f.OneHandIK && _profile.OneHandIK;
+            bool wantIk = wantTuning && f.OneHandIK && _profile.OneHandIK && !_ikFailed;
             bool wantSide = wantTuning && f.SideDodge && _profile.SideDodge;
 
             if (_tuned && (!wantTuning || wantIk != _tunedIk || wantSide != _tunedSide))
@@ -91,12 +92,8 @@ namespace CompetentAI.Mod
             if (_orig.dodgeCurve != null && Mathf.Abs(p.DodgeChanceMul - 1f) > 0.01f)
                 _defense.dodgeChanceCurve = ScaleCurve(_orig.dodgeCurve, p.DodgeChanceMul);
 
-            if (ik)
-            {
-                _defense.oneHandUsesIK = true;
-                _defense.oneHandMaxIKWeightPos = p.OneHandIKPos;
-                _defense.oneHandMaxIKWeightRot = p.OneHandIKRot;
-            }
+            // oneHandUsesIK is NOT set here: while it is true the stock HeldItemsChange calls EnableIK on every weapon
+            // change, which dereferences anchors that only exist after the first defence. TryEnableIk flips it later.
             if (side) _defense.sideDodgeEnabled = true;
 
             _tuned = true;
@@ -166,16 +163,21 @@ namespace CompetentAI.Mod
                  left.data.moduleAI.primaryClass == ItemModuleAI.WeaponClass.Shield)) return;
             try
             {
+                _defense.oneHandMaxIKWeightPos = _profile.OneHandIKPos;
+                _defense.oneHandMaxIKWeightRot = _profile.OneHandIKRot;
+                _defense.oneHandUsesIK = true; // anchors exist now, so the stock HeldItemsChange path is safe
                 _defense.EnableIK(right, Side.Right);
                 _ikEnabledByMe = true;
                 Log.Debug_(_tag + " one-hand parry IK enabled for " + right.data.id);
             }
             catch (Exception ex)
             {
-                // Experimental feature: if anything is off, give up on it for this creature only.
-                _tunedIk = false;
+                // Experimental feature: if anything is off, give up on it for this creature only, for good.
+                _ikFailed = true;
+                _ikEnabledByMe = false;
                 _defense.oneHandUsesIK = _orig.oneHandIK;
-                _ikEnabledByMe = true; // do not retry
+                _defense.oneHandMaxIKWeightPos = _orig.oneHandPos;
+                _defense.oneHandMaxIKWeightRot = _orig.oneHandRot;
                 Log.Warn(_tag + " could not enable weapon-placement IK, disabled for this creature: " + ex.Message);
             }
         }

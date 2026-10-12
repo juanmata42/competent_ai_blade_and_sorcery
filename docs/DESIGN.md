@@ -39,7 +39,7 @@ Aplicada **en runtime a la copia de cada NPC** (no por JSON de catálogo, para n
 | `DodgeChanceMul` | `dodgeChanceCurve` | Frecuencia de esquivas |
 | `RiposteChanceShift`, `RiposteDelayMul` | `BrainModuleMelee.recoilNothingRiposteChance`, `minMaxRiposteDelay` | Probabilidad y retraso del riposte tras parar |
 | `AttackIntervalMul`, `AnimSpeedMul` | `minMaxTimeBetweenAttack`, `animationSpeedMultiplier` | Ritmo de ataque |
-| `OneHandIK`, `OneHandIKPos/Rot` | `oneHandUsesIK` + pesos (+`EnableIK`) | Colocación activa del arma al parar (experimental) |
+| `OneHandIK`, `OneHandIKPos/Rot` | `oneHandUsesIK` + pesos (+`EnableIK`) | Colocación activa del arma al parar (experimental). Se activa **solo cuando el módulo de defensa de serie ya ha creado sus anclajes** (primera defensa): si se activara antes, el `HeldItemsChange` del juego lanzaría una excepción al desenfundar |
 | `SideDodge` | `sideDodgeEnabled` | Esquiva lateral (experimental) |
 
 Arquetipos: **Recruit / Soldier / Veteran / Duelist**, asignación por `creatura > facción > Brain > dificultad > por defecto`, más `GlobalLevelShift` y variación `Jitter` determinista por criatura. Tabla completa de valores: [CONFIG.reference.md](CONFIG.reference.md).
@@ -73,9 +73,9 @@ Arquetipos: **Recruit / Soldier / Veteran / Duelist**, asignación por `creatura
 
 ### 4c. Defensa
 - **Ajuste por arquetipo** (§3) y **IK de una mano** (experimental).
-- **Lectura de fintas** (`StrikeTracker` + `FeintReader`): se vigila la velocidad del golpe entrante que el juego ya calcula (`attackInfoLeft/Right`). Un giro > 75° en 0,35 s es una finta/redirección. Con probabilidad `1 − FeintReadSkill` la guardia **se queda congelada** (`parryAdjustSpeed ×0,12`, `FooledDuration`), y puede además comprometerse a una esquiva (`TryToDodge`): así *sufre* las fintas. Si la lee, la guardia se corrige más rápido (×1,6) durante 0,3 s.
-- **Fatiga de paradas** (`ParryFatigue`): `MaxParriesBeforeFatigue` paradas en `FatigueWindow` (3 s) dejan al NPC sin poder parar `FatigueDuration`: **no es imbatible**.
-- **Contraataque**: (i) tras parar, mediante `RiposteChanceShift/RiposteDelayMul` (mecanismo del juego), (ii) **tras esquivar**: al terminar la esquiva, con `CounterAfterDodgeChance` y dentro de 2,6 m, `AttackTarget`, (iii) combos.
+- **Lectura de fintas** (`StrikeTracker` + `FeintReader`): se vigila la velocidad del golpe entrante que el juego ya calcula (`attackInfoLeft/Right`). Un giro > 75° en 0,35 s **de un golpe que se estaba acercando al defensor** es una finta/redirección (el armado normal de un golpe —alejarse y luego venir— no cuenta). Con probabilidad `1 − FeintReadSkill` la guardia **se queda congelada** (`parryAdjustSpeed ×0,12`, `FooledDuration`), y puede además comprometerse a una esquiva (`TryToDodge`): así *sufre* las fintas. Si la lee, la guardia se corrige más rápido (×1,6) durante 0,3 s.
+- **Fatiga de paradas** (`ParryFatigue`): `MaxParriesBeforeFatigue` paradas en `FatigueWindow` (3 s) dejan al NPC sin poder parar `FatigueDuration`: **no es imbatible**. Se re-afirma `parryEnabled=false` en cada tick porque el árbol de comportamiento lo reescribe en cada ciclo de IA; los eventos de parada se agrupan (0,15 s) porque una parada genera varios eventos de colisión.
+- **Contraataque**: (i) tras parar, mediante `RiposteChanceShift/RiposteDelayMul` (mecanismo del juego), (ii) **tras esquivar**: al terminar la esquiva, con `CounterAfterDodgeChance`, dentro de 2,6 m, sin cambio de pose en curso, dentro del ángulo de ataque y respetando el máximo de atacantes del grupo (`meleeMax`), `AttackTarget`, (iii) combos.
 - **Clasificación de golpe entrante**: `Directions.DefenderLocalToAttackerLocal` + `Zones` permiten etiquetar el golpe con las mismas 9 direcciones y llevarlo a la rejilla 3×3 → pose de guardia (`Zones.GuardPoseId`). *En esta versión se usa para las fintas reactivas y el log; la selección fina de pose sigue siendo la del juego (mezcla continua de las 7 guardias).*
 
 ## 5. Configuración
@@ -92,7 +92,7 @@ Estrategia y análisis por mod en [COMPATIBILITY.md](COMPATIBILITY.md). Resumen:
 - Excepciones: nunca en el camino normal; el limitador de log evita inundar.
 
 ## 8. Plan de pruebas
-Unitarias (94, `dotnet test`) para toda la lógica pura, incl. el fichero de configuración distribuido y el manifest. Manuales: [TESTING.md](TESTING.md).
+Unitarias (104, `dotnet test`) para toda la lógica pura, incl. el fichero de configuración distribuido y el manifest. Manuales: [TESTING.md](TESTING.md).
 
 ## 9. Limitaciones conocidas y puntos NO VERIFICADOS
 | Punto | Estado |

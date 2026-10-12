@@ -121,22 +121,53 @@ namespace CompetentAI.Core.Tests
             Assert.True(c > b * 3, $"b={b} c={c}");
         }
 
+        // The strike point starts at x = 0 and the defender stands at +z 1.5 m: "approaching" means moving along +z.
+        private static readonly Vec3 ToDefender = new Vec3(0f, 0f, 1f);
+
         [Fact]
-        public void StrikeTracker_detects_a_reversal_once()
+        public void StrikeTracker_detects_a_feint_an_approaching_strike_that_pulls_back()
         {
             var t = new StrikeTracker();
             var cfg = new DefenseConfig();
             float now = 0f;
             int hits = 0;
             for (int i = 0; i < 10; i++, now += 0.02f)
-                if (t.Update(now, new Vec3(3f, 0f, 0f), cfg, out _)) hits++;
+                if (t.Update(now, new Vec3(0f, 0f, 3f), ToDefender, cfg, out _)) hits++;   // coming at the defender
             Assert.Equal(0, hits);
             for (int i = 0; i < 10; i++, now += 0.02f)
-                if (t.Update(now, new Vec3(-3f, 0.2f, 0f), cfg, out float a))
+                if (t.Update(now, new Vec3(0f, 0.2f, -3f), ToDefender, cfg, out float a))  // pulls back
                 {
                     hits++;
                     Assert.True(a > 150f);
                 }
+            Assert.Equal(1, hits);
+        }
+
+        [Fact]
+        public void StrikeTracker_does_not_treat_a_normal_backswing_then_strike_as_a_feint()
+        {
+            var t = new StrikeTracker();
+            var cfg = new DefenseConfig();
+            float now = 0f;
+            int hits = 0;
+            for (int i = 0; i < 8; i++, now += 0.02f)
+                if (t.Update(now, new Vec3(0f, 0f, -3f), ToDefender, cfg, out _)) hits++;  // wind-up: moving AWAY
+            for (int i = 0; i < 12; i++, now += 0.02f)
+                if (t.Update(now, new Vec3(0f, 0f, 4f), ToDefender, cfg, out _)) hits++;   // the real strike: towards
+            Assert.Equal(0, hits);
+        }
+
+        [Fact]
+        public void StrikeTracker_detects_a_sideways_redirection_of_an_approaching_strike()
+        {
+            var t = new StrikeTracker();
+            var cfg = new DefenseConfig();
+            float now = 0f;
+            int hits = 0;
+            for (int i = 0; i < 8; i++, now += 0.02f)
+                if (t.Update(now, new Vec3(0f, 0f, 3f), ToDefender, cfg, out _)) hits++;
+            for (int i = 0; i < 8; i++, now += 0.02f)
+                if (t.Update(now, new Vec3(3f, 0f, 0f), ToDefender, cfg, out _)) hits++;   // veers sideways (90 degrees)
             Assert.Equal(1, hits);
         }
 
@@ -149,13 +180,13 @@ namespace CompetentAI.Core.Tests
             int hits = 0;
             for (int i = 0; i < 60; i++, now += 0.02f)
             {
-                double ang = i * 0.02;
-                if (t.Update(now, new Vec3((float)Math.Cos(ang) * 3f, (float)Math.Sin(ang) * 3f, 0f), cfg, out _)) hits++;
+                double ang = 1.2 + i * 0.02; // slow arc around the approach direction: far below the reversal angle
+                if (t.Update(now, new Vec3((float)Math.Cos(ang) * 3f, 0f, (float)Math.Sin(ang) * 3f), ToDefender, cfg, out _)) hits++;
             }
             Assert.Equal(0, hits);
             var slow = new StrikeTracker();
             for (int i = 0; i < 20; i++, now += 0.02f)
-                Assert.False(slow.Update(now, new Vec3(i % 2 == 0 ? 0.05f : -0.05f, 0f, 0f), cfg, out _));
+                Assert.False(slow.Update(now, new Vec3(i % 2 == 0 ? 0.05f : -0.05f, 0f, 0f), ToDefender, cfg, out _));
         }
 
         [Fact]

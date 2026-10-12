@@ -12,6 +12,8 @@ namespace CompetentAI.Core
         {
             public float Time;
             public Vec3 Dir;
+            /// <summary>Cosine between the motion and the direction towards the defender (positive = approaching).</summary>
+            public float Approach;
         }
 
         private const int Capacity = 32;
@@ -27,8 +29,12 @@ namespace CompetentAI.Core
             _latchedUntil = 0f;
         }
 
-        /// <summary>Returns true exactly once per reversal.</summary>
-        public bool Update(float now, Vec3 velocity, DefenseConfig cfg, out float angle)
+        /// <summary>
+        /// Returns true exactly once per reversal. <paramref name="towardDefender"/> is the direction from the strike
+        /// point to the defender: only a motion that was APPROACHING the defender and then changes direction counts
+        /// as a feint. A back-swing followed by the real strike (away, then towards) is a normal attack, not a feint.
+        /// </summary>
+        public bool Update(float now, Vec3 velocity, Vec3 towardDefender, DefenseConfig cfg, out float angle)
         {
             angle = 0f;
             if (velocity.Magnitude < cfg.MinStrikeSpeed) return false;
@@ -42,7 +48,7 @@ namespace CompetentAI.Core
             {
                 Sample oldest = Get(_count - 1);
                 float a = Vec3.Angle(oldest.Dir, dir);
-                if (a >= cfg.ReversalAngle)
+                if (a >= cfg.ReversalAngle && oldest.Approach > 0.2f)
                 {
                     reversed = true;
                     angle = a;
@@ -52,7 +58,8 @@ namespace CompetentAI.Core
             }
 
             _head = (_head + 1) % Capacity;
-            _samples[_head] = new Sample { Time = now, Dir = dir };
+            Vec3 toward = towardDefender.Normalized;
+            _samples[_head] = new Sample { Time = now, Dir = dir, Approach = toward.SqrMagnitude < 0.5f ? 1f : Vec3.Dot(dir, toward) };
             if (_count < Capacity) _count++;
             return reversed;
         }

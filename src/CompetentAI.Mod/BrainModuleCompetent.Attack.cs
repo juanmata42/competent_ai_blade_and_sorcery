@@ -119,8 +119,8 @@ namespace CompetentAI.Mod
             {
                 AttackMotion m = openers[i];
                 if (!TryInfo(m, out MotionInfo mi)) continue;
-                StanceCurator.RefreshDirection(mi, Runtime.Dirs);
                 if (!RangeFits(m, distance)) continue;
+                StanceCurator.RefreshDirection(mi, Runtime.Dirs);
                 float w = mi.BaseWeight;
                 if (m.sourceIdle != "Any" && m.sourceIdle != poseId) w *= 0.35f; // switching pose costs ~0.8 s
                 mi.Candidate.Weight = w;
@@ -295,6 +295,7 @@ namespace CompetentAI.Mod
             _pendingDouble = dbl; // read by OnWindUp of the redirected attack, which starts synchronously below
             AbortAttack(first);
             _melee.TriggerAttack(0f, redirect, _melee, target.transform);
+            _pendingDouble = false; // consumed by OnWindUp when the redirect started; never leave it armed otherwise
         }
 
         /// <summary>Stops the running attack without letting our own End-stage handler treat it as a finished attack.</summary>
@@ -355,8 +356,12 @@ namespace CompetentAI.Mod
             if (!Runtime.Flags.CounterAfterDodge || _profile.CounterAfterDodgeChance <= 0f) { _counterRolled = true; return; }
             if (_brain.isAttacking || _brain.isDodging || creature.IsAnimatorBusy() || _brain.currentStagger != Brain.Stagger.None) return;
 
+            if (_stance.switching) return; // the stock attack node refuses while the pose switches; retry next frame
             _counterRolled = true;
             if (DistanceTo(target) > Runtime.Cfg.Defense.CounterMaxDistance) return;
+            if (_brain.GetHorizontalAngle(target.transform) > _melee.attackMaxAngle) return;
+            _detection.CheckAllies(target);
+            if (_detection.allyAttackingCount >= _melee.meleeMax) return; // respect the group's attacker limit
             if (_rng.Value() >= _profile.CounterAfterDodgeChance) return;
             Log.Defense($"{_tag} counter-attack after dodge");
             _melee.AttackTarget(target.transform);

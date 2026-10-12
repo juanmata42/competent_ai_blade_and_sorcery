@@ -32,7 +32,7 @@ namespace CompetentAI.Core
         };
 
         /// <summary>Fraction of the motion that must point forward for it to count as a thrust.</summary>
-        public const float DefaultThrustRatio = 0.65f;
+        public const float DefaultThrustRatio = 0.8f;
 
         /// <summary>Minimum travelled distance (metres) for a measured motion to be classified at all.</summary>
         public const float MinMeasurableTravel = 0.15f;

@@ -115,6 +115,14 @@ namespace CompetentAI.Mod
             }
         }
 
+        public static void PruneDeadCreatures()
+        {
+            List<Creature> dead = null;
+            foreach (var kv in Modules)
+                if (kv.Key == null) (dead ?? (dead = new List<Creature>())).Add(kv.Key);
+            if (dead != null) foreach (Creature c in dead) Modules.Remove(c);
+        }
+
         public static void Register(Creature c, BrainModuleCompetent m) => Modules[c] = m;
 
         public static void Unregister(Creature c, BrainModuleCompetent m)

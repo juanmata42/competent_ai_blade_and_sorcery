@@ -27,7 +27,7 @@ Conclusión: **ningún mod encontrado** combina (a) filtro de ataques por lo que
 **Mod solo código para PC** (el usuario eligió "Solo PC"), una DLL (`CompetentAI.dll`, `netstandard2.1`) + `manifest.json` + `CompetentAI.config.json`. Sin Unity, sin SDK, sin catálogos sobrescritos, sin Harmony.
 
 Capas:
-1. **Core puro** (`CompetentAI.Core`): `Directions` (9 ángulos), `Zones` (rejilla 3×3 defensiva), `AttackRules` + `WeaponClassifier`, `Variety` (memoria + ponderación), `Feints`, `Defense` (detector de reversión, lector de fintas, fatiga de paradas), `Calibration`, `Profiles`/`Config`. 94 tests.
+1. **Core puro** (`CompetentAI.Core`): `Directions` (9 ángulos), `Zones` (rejilla 3×3 defensiva), `AttackRules` + `WeaponClassifier`, `Variety` (memoria + ponderación), `Feints`, `Defense` (detector de reversión, lector de fintas, fatiga de paradas), `Calibration`, `Profiles`/`Config`. 104 tests.
 2. **Integración** (`CompetentAI.Mod`): `ThunderScript` + un `BrainData.Module` propio **añadido al final** de `brain.instance.modules` de cada NPC.
 3. **Datos**: JSON de configuración con arquetipos (Recruit/Soldier/Veteran/Duelist); no se toca ningún JSON del juego.
 

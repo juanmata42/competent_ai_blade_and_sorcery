@@ -121,7 +121,14 @@ namespace CompetentAI.Mod
             {
                 Log.Error($"{_tag}: controller disabled for this creature, stock AI continues");
                 _disabled = true;
-                try { RestoreTuning(); RestoreWeights(); } catch { /* best effort */ }
+                try
+                {
+                    if (_fatigueApplied && _defense != null) _defense.parryEnabled = _origCaptured ? _orig.parryEnabled : true;
+                    _fatigueApplied = false;
+                    RestoreTuning();
+                    RestoreWeights();
+                }
+                catch { /* best effort */ }
             }
         }
 
