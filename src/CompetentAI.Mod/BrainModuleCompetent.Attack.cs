@@ -215,6 +215,7 @@ namespace CompetentAI.Mod
             if (atk == _planned) _planned = null; // consumed; next plan after this attack
             RestoreWeights();
 
+            ArmRecoilGuard(_kataExpectStep);
             float window = atk.GetRealStartTime(_melee.GetBrainSpeedMultiplier(atk.attackSide));
             bool forced = _pendingDouble;
             _pendingDouble = false;

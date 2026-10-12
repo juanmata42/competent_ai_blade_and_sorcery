@@ -54,7 +54,7 @@ namespace CompetentAI.Mod
             if (_melee.attack != atk || !_brain.isAttacking || _brain.currentStagger != Brain.Stagger.None) { EndKata("stopped by the game"); return true; }
 
             MeleeStanceData md = _stance.currentStanceData as MeleeStanceData;
-            if (_melee.lastHitType == BrainModuleMelee.HitType.Body && md != null && md.chainAttacksOnBody == MeleeStanceData.BodyChainBehaviour.Disabled)
+            if (!Runtime.Cfg.Katas.ChainAfterBodyHit && _melee.lastHitType == BrainModuleMelee.HitType.Body && md != null && md.chainAttacksOnBody == MeleeStanceData.BodyChainBehaviour.Disabled)
             {
                 EndKata("hit the body (this stance does not chain on bodies)");
                 return true;

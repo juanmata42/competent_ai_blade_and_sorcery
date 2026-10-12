@@ -64,6 +64,7 @@ namespace CompetentAI.Mod
                     (info.parryTarget == null || _detection.attackInfoLeft.targetPointVelocity.sqrMagnitude > info.targetPointVelocity.sqrMagnitude))
                     info = _detection.attackInfoLeft;
 
+                if (_tuned) ReactiveDodge(now, info);
                 Vector3 toDefender = creature.transform.position - info.targetPoint;
                 if (info.parryTarget != null &&
                     _tracker.Update(now, ToVec(info.targetPointVelocity), ToVec(toDefender), info.onHitCourse, Runtime.Cfg.Defense, out float angle))

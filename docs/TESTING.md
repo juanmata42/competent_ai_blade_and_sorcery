@@ -66,6 +66,8 @@ Para cada uno: lucha 1 contra 1 durante ~2 minutos, luego copia las líneas del 
 | F7 | **Parada con IK** (Veteran/Duelist) | Mira sus brazos al parar un golpe con una sola arma | La hoja sale a tu golpe; **sin brazos retorcidos ni temblor** | `one-hand parry IK enabled for …`; si falla: `could not enable weapon-placement IK`. Efecto secundario esperado: su arma también **desvía hechizos** que le lances |
 | F8 | **Esquiva lateral** (Duelist) | Ataca con una estocada a un Duelist (`HumanVIP`) | Puede apartarse de lado (si la animación existe) | `tuning applied … side=True` |
 | F9 | **Direcciones medidas** | Tras ~20 ataques revisa `calibration.json` | Contiene una entrada por ataque con su dirección | `measured SwingTopToLeft: DownLeft (travel …)` |
+| F10 | **Presión (0.5.0)** | *Skill level* 3 y luego 4; quédate a 2–3 m sin atacar, luego para sus golpes | Sin pausas largas ni círculos: ataca a los ~0,3–1,6 s; las secuencias **no se rompen al parar el primer golpe**; solo se cortan si tú te vuelves peligroso | `attack-despite-danger active on N attack node(s)`; `kata ended … completed` con 3–6 golpes |
+| F11 | **Piernas y estocadas (0.5.0)** | Nivel 3–4: golpea a las piernas y haz 3–4 estocadas rectas seguidas | A veces esquiva o para; los golpes que entren quedan en el log | `reactive dodge (leg strike / thrust …)`, `HIT <daño> (<tipo>) at height 0.xx` (altura 0 = pies, 1 = ojos) |
 
 Para F9 compara: ¿coincide la dirección medida con lo que ves? (En el log, `stance … openers=[id:Kind/Direction/source]`: `source` es `name` (inferida del nombre), `measured` o `unknown`.)
 

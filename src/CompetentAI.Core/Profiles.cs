@@ -22,6 +22,36 @@ namespace CompetentAI.Core
         public float RiposteDelayMul = 1f;
         /// <summary>Scales minMaxTimeBetweenAttack: &lt;1 = attacks more often.</summary>
         public float AttackIntervalMul = 1f;
+        /// <summary>
+        /// Upper limits (seconds) for minMaxTimeBetweenAttack, applied AFTER the multiplier. They make a forced skill level
+        /// real: an easy brain attacks every 2-3 s, a Duelist must not. 0 = no limit.
+        /// </summary>
+        public float AttackIntervalCapMin = 0f;
+        public float AttackIntervalCapMax = 0f;
+        /// <summary>Lower limit for the guard-follow speed (stock 7), applied after the multiplier. 0 = none.</summary>
+        public float ParryAdjustSpeedFloor = 0f;
+        /// <summary>
+        /// Scales maxRangeDelta, the tolerance of the attack-distance windows. The stock windows leave gaps (about 1.3-1.7 m
+        /// and 2.2-2.35 m) where the creature has no attack and just circles; wider windows remove most of them.
+        /// </summary>
+        public float RangeDeltaMul = 1f;
+        /// <summary>
+        /// Chance (re-rolled every half second) that the creature attacks even though the opponent's weapon is moving
+        /// dangerously. The stock attack node refuses in proportion to the danger level, which reads as hesitation.
+        /// </summary>
+        public float AttackDespiteDanger = 0f;
+        /// <summary>
+        /// Chance that an attack is NOT interrupted when the opponent parries it (the stock recoil). Attacks of a chained
+        /// sequence are always protected. High = keeps swinging after being parried.
+        /// </summary>
+        public float ParryRecoilResist = 0f;
+        /// <summary>Scales the dodge cooldown (stock 0.5-1 s): &lt;1 = can dodge again sooner (several thrusts in a row).</summary>
+        public float DodgeCooldownMul = 1f;
+        /// <summary>Chance to react with a dodge to a strike aimed at the legs.</summary>
+        public float LegDodgeChance = 0f;
+        /// <summary>Chance to react with a dodge to a straight thrust.</summary>
+        public float ThrustDodgeChance = 0f;
+
         /// <summary>Scales melee animation speed.</summary>
         public float AnimSpeedMul = 1f;
         /// <summary>Actively place a single one-handed weapon in the strike's path (stock: disabled).</summary>
@@ -82,6 +112,7 @@ namespace CompetentAI.Core
                 ["Recruit"] = new SkillProfile
                 {
                     ParryAdjustSpeedMul = 0.85f, AboutToBeHitMul = 0.9f, DodgeChanceMul = 0.8f,
+                    RangeDeltaMul = 1.0f, AttackDespiteDanger = 0.0f, ParryRecoilResist = 0.0f, DodgeCooldownMul = 1.0f, LegDodgeChance = 0.05f, ThrustDodgeChance = 0.10f,
                     RiposteChanceShift = -0.05f, RiposteDelayMul = 1.25f, AttackIntervalMul = 1.2f, AnimSpeedMul = 0.95f,
                     VarietyStrength = 0.5f, FeintChance = 0.00f, DoubleFeintChance = 0f, ComboChance = 0.25f, ComboMaxLength = 3, ComboCommitment = 0.9f, InterruptDanger = 0.8f, PressureBias = 1.0f,
                     CounterAfterDodgeChance = 0.10f, FeintReadSkill = 0.25f, FooledDuration = 0.55f,
@@ -90,6 +121,8 @@ namespace CompetentAI.Core
                 ["Soldier"] = new SkillProfile
                 {
                     ParryAdjustSpeedMul = 1.1f, AboutToBeHitMul = 1.0f, DodgeChanceMul = 1.0f,
+                    AttackIntervalCapMin = 1.0f, AttackIntervalCapMax = 1.6f, ParryAdjustSpeedFloor = 7f,
+                    RangeDeltaMul = 1.3f, AttackDespiteDanger = 0.2f, ParryRecoilResist = 0.25f, DodgeCooldownMul = 0.9f, LegDodgeChance = 0.25f, ThrustDodgeChance = 0.30f,
                     RiposteChanceShift = 0.0f, RiposteDelayMul = 1.0f, AttackIntervalMul = 1.0f, AnimSpeedMul = 1.0f,
                     VarietyStrength = 0.8f, FeintChance = 0.08f, DoubleFeintChance = 0.0f, ComboChance = 0.40f, ComboMaxLength = 4, ComboCommitment = 0.6f, InterruptDanger = 0.6f, PressureBias = 1.3f,
                     CounterAfterDodgeChance = 0.25f, FeintReadSkill = 0.5f, FooledDuration = 0.45f,
@@ -98,6 +131,8 @@ namespace CompetentAI.Core
                 ["Veteran"] = new SkillProfile
                 {
                     ParryAdjustSpeedMul = 1.4f, AboutToBeHitMul = 1.15f, DodgeChanceMul = 1.2f,
+                    AttackIntervalCapMin = 0.3f, AttackIntervalCapMax = 0.8f, ParryAdjustSpeedFloor = 9f,
+                    RangeDeltaMul = 1.7f, AttackDespiteDanger = 0.5f, ParryRecoilResist = 0.5f, DodgeCooldownMul = 0.6f, LegDodgeChance = 0.45f, ThrustDodgeChance = 0.50f, SideDodge = true,
                     RiposteChanceShift = 0.05f, RiposteDelayMul = 0.85f, AttackIntervalMul = 0.85f, AnimSpeedMul = 1.05f,
                     OneHandIK = true, OneHandIKPos = 0.15f, OneHandIKRot = 0.6f,
                     VarietyStrength = 1.0f, FeintChance = 0.18f, DoubleFeintChance = 0.04f, ReactiveFeintBoost = 1.7f,
@@ -107,6 +142,8 @@ namespace CompetentAI.Core
                 ["Duelist"] = new SkillProfile
                 {
                     ParryAdjustSpeedMul = 1.7f, AboutToBeHitMul = 1.3f, DodgeChanceMul = 1.4f,
+                    AttackIntervalCapMin = 0.0f, AttackIntervalCapMax = 0.35f, ParryAdjustSpeedFloor = 11f,
+                    RangeDeltaMul = 2.0f, AttackDespiteDanger = 0.7f, ParryRecoilResist = 0.75f, DodgeCooldownMul = 0.4f, LegDodgeChance = 0.65f, ThrustDodgeChance = 0.70f,
                     RiposteChanceShift = 0.1f, RiposteDelayMul = 0.7f, AttackIntervalMul = 0.7f, AnimSpeedMul = 1.1f,
                     OneHandIK = true, OneHandIKPos = 0.25f, OneHandIKRot = 0.75f, SideDodge = true,
                     VarietyStrength = 1.0f, FeintChance = 0.3f, DoubleFeintChance = 0.1f, ReactiveFeintBoost = 2.0f,
@@ -125,6 +162,15 @@ namespace CompetentAI.Core
             RiposteChanceShift = Clamp(RiposteChanceShift, -0.5f, 0.5f);
             RiposteDelayMul = Clamp(RiposteDelayMul, 0.2f, 3f);
             AttackIntervalMul = Clamp(AttackIntervalMul, 0.25f, 3f);
+            AttackIntervalCapMin = Clamp(AttackIntervalCapMin, 0f, 10f);
+            AttackIntervalCapMax = Clamp(AttackIntervalCapMax, 0f, 20f);
+            ParryAdjustSpeedFloor = Clamp(ParryAdjustSpeedFloor, 0f, 40f);
+            RangeDeltaMul = Clamp(RangeDeltaMul, 0.5f, 3f);
+            AttackDespiteDanger = Clamp(AttackDespiteDanger, 0f, 1f);
+            ParryRecoilResist = Clamp(ParryRecoilResist, 0f, 1f);
+            DodgeCooldownMul = Clamp(DodgeCooldownMul, 0.1f, 3f);
+            LegDodgeChance = Clamp(LegDodgeChance, 0f, 1f);
+            ThrustDodgeChance = Clamp(ThrustDodgeChance, 0f, 1f);
             AnimSpeedMul = Clamp(AnimSpeedMul, 0.6f, 1.6f);
             OneHandIKPos = Clamp(OneHandIKPos, 0f, 0.6f);
             OneHandIKRot = Clamp(OneHandIKRot, 0f, 1f);

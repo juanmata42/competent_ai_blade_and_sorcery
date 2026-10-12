@@ -21,6 +21,9 @@ namespace CompetentAI.Mod
             public float oneHandRot;
             public bool sideDodge;
             public bool parryEnabled;
+            public float rangeDelta;
+            public Vector2 dodgeCooldown;
+            public float recoilMin;
         }
 
         private Originals _orig;
@@ -74,7 +77,10 @@ namespace CompetentAI.Mod
                 oneHandPos = _defense.oneHandMaxIKWeightPos,
                 oneHandRot = _defense.oneHandMaxIKWeightRot,
                 sideDodge = _defense.sideDodgeEnabled,
-                parryEnabled = _defense.parryEnabled
+                parryEnabled = _defense.parryEnabled,
+                rangeDelta = _melee.maxRangeDelta,
+                dodgeCooldown = _defense.minMaxDodgeCooldown,
+                recoilMin = _melee.recoilMinWeaponSpeed
             };
             _origCaptured = true;
         }
@@ -85,7 +91,15 @@ namespace CompetentAI.Mod
             SkillProfile p = _profile;
 
             Vector2 iv = _orig.attackInterval;
-            _melee.minMaxTimeBetweenAttack = new Vector2(iv.x * p.AttackIntervalMul, iv.y * p.AttackIntervalMul);
+            float ix = iv.x * p.AttackIntervalMul, iy = iv.y * p.AttackIntervalMul;
+            if (p.AttackIntervalCapMax > 0f)
+            {
+                ix = Mathf.Min(ix, p.AttackIntervalCapMin);
+                iy = Mathf.Min(iy, p.AttackIntervalCapMax);
+                if (iy < ix) iy = ix;
+            }
+            _melee.minMaxTimeBetweenAttack = new Vector2(ix, iy);
+            _melee.maxRangeDelta = Mathf.Min(0.55f, _orig.rangeDelta * p.RangeDeltaMul);
             _melee.animationSpeedMultiplier = _orig.animSpeed * p.AnimSpeedMul;
 
             Vector2 rc = _orig.riposteChance;
@@ -93,7 +107,8 @@ namespace CompetentAI.Mod
             Vector2 rd = _orig.riposteDelay;
             _melee.minMaxRiposteDelay = new Vector2(rd.x * p.RiposteDelayMul, rd.y * p.RiposteDelayMul);
 
-            _baseAdjust = _orig.parryAdjust * p.ParryAdjustSpeedMul;
+            _baseAdjust = Mathf.Max(_orig.parryAdjust * p.ParryAdjustSpeedMul, p.ParryAdjustSpeedFloor);
+            _defense.minMaxDodgeCooldown = _orig.dodgeCooldown * p.DodgeCooldownMul;
             _defense.parryAdjustSpeed = _baseAdjust;
             _defense.aboutToBeHitTiming = _orig.aboutToBeHit * p.AboutToBeHitMul;
             if (_orig.dodgeCurve != null && Mathf.Abs(p.DodgeChanceMul - 1f) > 0.01f)
@@ -116,6 +131,10 @@ namespace CompetentAI.Mod
             if (!_tuned || !_origCaptured) return;
             _melee.minMaxTimeBetweenAttack = _orig.attackInterval;
             _melee.animationSpeedMultiplier = _orig.animSpeed;
+            _melee.maxRangeDelta = _orig.rangeDelta;
+            _melee.recoilMinWeaponSpeed = _orig.recoilMin;
+            _defense.minMaxDodgeCooldown = _orig.dodgeCooldown;
+            RestoreDefensePreference();
             _melee.recoilNothingRiposteChance = _orig.riposteChance;
             _melee.minMaxRiposteDelay = _orig.riposteDelay;
             _defense.parryAdjustSpeed = _orig.parryAdjust;

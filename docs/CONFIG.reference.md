@@ -109,11 +109,20 @@ Each profile has the same fields. Defaults per archetype:
 | `RiposteChanceShift` | Subtracted from recoilNothingRiposteChance (x and y): positive = more ripostes. | -0.5 … 0.5 | -0.05 | 0 | 0.05 | 0.1 |
 | `RiposteDelayMul` | Scales minMaxRiposteDelay: <1 = counters sooner. | 0.2 … 3 | 1.25 | 1 | 0.85 | 0.7 |
 | `AttackIntervalMul` | Scales minMaxTimeBetweenAttack: <1 = attacks more often. | 0.25 … 3 | 1.2 | 1 | 0.85 | 0.7 |
+| `AttackIntervalCapMin` | Upper limits (seconds) for minMaxTimeBetweenAttack, applied AFTER the multiplier. They make a forced skill level real: an easy brain attacks every 2-3 s, a Duelist must not. 0 = no limit.  | 0 … 10 | 0 | 1 | 0.3 | 0 |
+| `AttackIntervalCapMax` |  | 0 … 20 | 0 | 1.6 | 0.8 | 0.35 |
+| `ParryAdjustSpeedFloor` | Lower limit for the guard-follow speed (stock 7), applied after the multiplier. 0 = none. | 0 … 40 | 0 | 7 | 9 | 11 |
+| `RangeDeltaMul` | Scales maxRangeDelta, the tolerance of the attack-distance windows. The stock windows leave gaps (about 1.3-1.7 m and 2.2-2.35 m) where the creature has no attack and just circles; wider windows remove most of them.  | 0.5 … 3 | 1 | 1.3 | 1.7 | 2 |
+| `AttackDespiteDanger` | Chance (re-rolled every half second) that the creature attacks even though the opponent's weapon is moving dangerously. The stock attack node refuses in proportion to the danger level, which reads as hesitation.  | 0 … 1 | 0 | 0.2 | 0.5 | 0.7 |
+| `ParryRecoilResist` | Chance that an attack is NOT interrupted when the opponent parries it (the stock recoil). Attacks of a chained sequence are always protected. High = keeps swinging after being parried.  | 0 … 1 | 0 | 0.25 | 0.5 | 0.75 |
+| `DodgeCooldownMul` | Scales the dodge cooldown (stock 0.5-1 s): <1 = can dodge again sooner (several thrusts in a row). | 0.1 … 3 | 1 | 0.9 | 0.6 | 0.4 |
+| `LegDodgeChance` | Chance to react with a dodge to a strike aimed at the legs. | 0 … 1 | 0.05 | 0.25 | 0.45 | 0.65 |
+| `ThrustDodgeChance` | Chance to react with a dodge to a straight thrust. | 0 … 1 | 0.1 | 0.3 | 0.5 | 0.7 |
 | `AnimSpeedMul` | Scales melee animation speed. | 0.6 … 1.6 | 0.95 | 1 | 1.05 | 1.1 |
 | `OneHandIK` | Actively place a single one-handed weapon in the strike's path (stock: disabled). | true/false | false | false | true | true |
 | `OneHandIKPos` | How strongly (0-1) the hand position follows the strike when OneHandIK is on. | 0 … 0.6 | 0.1 | 0.1 | 0.15 | 0.25 |
 | `OneHandIKRot` | How strongly (0-1) the hand rotation follows the strike when OneHandIK is on. | 0 … 1 | 0.5 | 0.5 | 0.6 | 0.75 |
-| `SideDodge` | Allow the director to pick sidesteps (needs the game's side-dodge animations). | true/false | false | false | false | true |
+| `SideDodge` | Allow the director to pick sidesteps (needs the game's side-dodge animations). | true/false | false | false | true | true |
 | `VarietyStrength` | 0..1: how strongly attack memory shapes the choice. | 0 … 1 | 0.5 | 0.8 | 1 | 1 |
 | `FeintChance` | Chance per attack to start it as a feint. | 0 … 0.8 | 0 | 0.08 | 0.18 | 0.3 |
 | `DoubleFeintChance` | Chance that a feint is followed by a second feint. | 0 … 0.6 | 0 | 0 | 0.04 | 0.1 |

@@ -1,7 +1,7 @@
 # PROGRESS — Competent AI (Blade & Sorcery)
 
 ## Estado actual (2026-10-12)
-**Versión 0.4.0 (124 tests en verde) y documentada. NO probada en el juego** (no se puede ejecutar desde el entorno de desarrollo). Siguiente hito: que el usuario la pruebe con [TESTING.md](TESTING.md).
+**Versión 0.5.0 (129 tests en verde) y documentada. Probada parcialmente por el usuario (0.4.x); los cambios de 0.5.0 aún no** (no se puede ejecutar desde el entorno de desarrollo). Siguiente hito: que el usuario la pruebe con [TESTING.md](TESTING.md).
 
 | Fase | Estado |
 |---|---|
@@ -46,6 +46,11 @@ Un subagente revisó el código de integración contra el del juego (12 hallazgo
 - Los hechizos de práctica **funcionaban mal** según el usuario → retirados (etiqueta `sparring-v0.3.1`).
 - Del log salieron cuatro fallos reales ya corregidos en 0.4.0 (ver CHANGELOG): armas de punta sin ataques por el filtro de dificultad, medición de direcciones sesgada a estocada, nombres de ataque invertidos, detector de fintas demasiado sensible.
 - **Aún sin ver en el log**: peleas reales (fintas del NPC, katas, contraataque tras esquivar) fuera de la demostración; hace falta una prueba de combate normal.
+
+## Segunda y tercera prueba (0.4.1–0.4.2) → 0.5.0
+- Feedback: mejor al parar, pero «atacan al tanteo», dudan, rodean, no encadenan 3–5 golpes; las piernas y las estocadas rectas siempre entran.
+- Causas halladas en el log y el código del juego: el retroceso por parada (`recoilMinWeaponSpeed` + `StopAttack`) corta la secuencia; mi regla «golpe al cuerpo termina la kata»; los perfiles solo multiplicaban los tiempos del cerebro (un `HumanEasy` forzado a Duelist seguía lento); huecos entre ventanas de distancia; `defensePreferenceChance` del nodo `AttackMelee`; sin reacción a golpes bajos/estocadas.
+- 0.5.0 los aborda (ver CHANGELOG) y añade el log `HIT …` para diagnosticar qué golpes entran. **Pendiente de validar en el juego.**
 
 ## Registro de cambios de proceso
 - 2026-10-12: Fase 0 → Fase 1 → … → 4 ejecutadas de una tacada por mandato del usuario. Revisión independiente del código de integración hecha por un subagente (ver sección anterior).

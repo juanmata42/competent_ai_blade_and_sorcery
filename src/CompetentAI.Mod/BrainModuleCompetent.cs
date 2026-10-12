@@ -82,6 +82,7 @@ namespace CompetentAI.Mod
                 _tracker = new StrikeTracker();
 
                 _stance.OnStanceChange += OnStanceChange;
+                creature.OnDamageEvent += OnDamaged;
                 Runtime.Register(creature, this);
                 _loaded = true;
 
@@ -100,6 +101,7 @@ namespace CompetentAI.Mod
             try
             {
                 if (_stance != null) _stance.OnStanceChange -= OnStanceChange;
+                if (creature != null) creature.OnDamageEvent -= OnDamaged;
                 Runtime.Unregister(creature, this);
                 _loaded = false;
             }
@@ -213,6 +215,8 @@ namespace CompetentAI.Mod
                 if (_planned != null) ClearPlan();
                 return;
             }
+            AggressionTick(now);
+            if (!_brain.isAttacking) DisarmRecoilGuard();
             FeintTick(now, target);
             KataTick(now);
             CounterTick(now, target);

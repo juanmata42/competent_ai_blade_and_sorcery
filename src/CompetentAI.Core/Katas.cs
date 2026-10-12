@@ -32,6 +32,9 @@ namespace CompetentAI.Core
 
         /// <summary>Probability to add one more step to a sequence, applied repeatedly up to the profile's maximum.</summary>
         public float ExtendChance = 0.65f;
+
+        /// <summary>Keep chaining after a strike lands on the body (pressure); false = stop, like the stock chain rules.</summary>
+        public bool ChainAfterBodyHit = true;
     }
 
     public static class KataPlanner

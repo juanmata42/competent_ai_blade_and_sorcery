@@ -2,6 +2,16 @@
 
 Formato basado en *Keep a Changelog*. Versionado semántico (`ModVersion` del manifest).
 
+## [0.5.0] — 2026-10-12
+
+### Cambiado (a raíz de «atacan al tanteo, dudan, giran en círculo; los golpes a las piernas y las estocadas rectas siempre entran»)
+- **Las secuencias ya no se cortan al ser paradas.** Causa (código del juego): al parar un ataque, `OnWeaponCollision` aplica un retroceso (`TryPush(Parry)`) cuando la velocidad del arma supera `recoilMinWeaponSpeed`, y la reacción del cerebro llama a `StopAttack`. Ahora los golpes de una secuencia (y, con probabilidad `ParryRecoilResist` por perfil, también los golpes sueltos) suben ese umbral mientras dura el ataque y se restaura al terminar.
+- Una secuencia **ya no termina cuando un golpe acierta en el cuerpo** (`Katas.ChainAfterBodyHit`, true por defecto; antes copiaba la regla de la postura).
+- **Menos dudas**: nuevos límites por perfil que hacen real un nivel forzado aunque el cerebro sea fácil: `AttackIntervalCapMin/Max` (tope del intervalo entre ataques tras el multiplicador), `ParryAdjustSpeedFloor`, `RangeDeltaMul` (ensancha las ventanas de distancia de ataque, que dejaban huecos de ~0,5 m donde el NPC solo rodeaba) y `AttackDespiteDanger` (probabilidad, cada 0,5 s, de que el nodo `AttackMelee` ignore su «preferencia por defender» y ataque aunque tu arma se mueva peligrosamente). Los nodos se buscan en el árbol propio de cada criatura (`TreeTweaks`) y se restauran al desactivar el mod.
+- **Defensa contra piernas y estocadas**: esquiva reactiva (`LegDodgeChance`, `ThrustDodgeChance`) cuando un golpe a la altura de las piernas o una estocada recta va a impactar, y enfriamiento de esquiva más corto (`DodgeCooldownMul`) para poder esquivar varias estocadas seguidas.
+- **Diagnóstico**: en nivel Debug cada golpe que recibe un NPC queda en el log (`HIT daño (tipo) a altura 0.xx`, guardia, si esquivaba/atacaba/estaba agotado) y cada esquiva reactiva también.
+- Valores por defecto (Recruit → Duelist): ParryRecoilResist 0 / 0,25 / 0,5 / 0,75; AttackDespiteDanger 0 / 0,2 / 0,5 / 0,7; RangeDeltaMul 1 / 1,3 / 1,7 / 2; tope máx. de intervalo — / 1,6 s / 0,8 s / 0,35 s.
+
 ## [0.4.2] — 2026-10-12
 
 ### Añadido
