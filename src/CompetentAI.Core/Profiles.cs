@@ -83,7 +83,7 @@ namespace CompetentAI.Core
                 {
                     ParryAdjustSpeedMul = 0.85f, AboutToBeHitMul = 0.9f, DodgeChanceMul = 0.8f,
                     RiposteChanceShift = -0.05f, RiposteDelayMul = 1.25f, AttackIntervalMul = 1.2f, AnimSpeedMul = 0.95f,
-                    VarietyStrength = 0.5f, FeintChance = 0.00f, DoubleFeintChance = 0f, ComboChance = 0.05f, ComboMaxLength = 2, ComboCommitment = 0.9f, InterruptDanger = 0.8f, PressureBias = 1.0f,
+                    VarietyStrength = 0.5f, FeintChance = 0.00f, DoubleFeintChance = 0f, ComboChance = 0.25f, ComboMaxLength = 3, ComboCommitment = 0.9f, InterruptDanger = 0.8f, PressureBias = 1.0f,
                     CounterAfterDodgeChance = 0.10f, FeintReadSkill = 0.25f, FooledDuration = 0.55f,
                     MaxParriesBeforeFatigue = 3, FatigueDuration = 1.1f
                 },
@@ -91,7 +91,7 @@ namespace CompetentAI.Core
                 {
                     ParryAdjustSpeedMul = 1.1f, AboutToBeHitMul = 1.0f, DodgeChanceMul = 1.0f,
                     RiposteChanceShift = 0.0f, RiposteDelayMul = 1.0f, AttackIntervalMul = 1.0f, AnimSpeedMul = 1.0f,
-                    VarietyStrength = 0.8f, FeintChance = 0.08f, DoubleFeintChance = 0.0f, ComboChance = 0.15f, ComboMaxLength = 3, ComboCommitment = 0.6f, InterruptDanger = 0.6f, PressureBias = 1.3f,
+                    VarietyStrength = 0.8f, FeintChance = 0.08f, DoubleFeintChance = 0.0f, ComboChance = 0.40f, ComboMaxLength = 4, ComboCommitment = 0.6f, InterruptDanger = 0.6f, PressureBias = 1.3f,
                     CounterAfterDodgeChance = 0.25f, FeintReadSkill = 0.5f, FooledDuration = 0.45f,
                     MaxParriesBeforeFatigue = 4, FatigueDuration = 0.9f
                 },
@@ -101,7 +101,7 @@ namespace CompetentAI.Core
                     RiposteChanceShift = 0.05f, RiposteDelayMul = 0.85f, AttackIntervalMul = 0.85f, AnimSpeedMul = 1.05f,
                     OneHandIK = true, OneHandIKPos = 0.15f, OneHandIKRot = 0.6f,
                     VarietyStrength = 1.0f, FeintChance = 0.18f, DoubleFeintChance = 0.04f, ReactiveFeintBoost = 1.7f,
-                    ComboChance = 0.28f, ComboMaxLength = 4, ComboCommitment = 0.35f, InterruptDanger = 0.45f, PressureBias = 1.6f, CounterAfterDodgeChance = 0.4f, FeintReadSkill = 0.72f, FooledDuration = 0.38f,
+                    ComboChance = 0.55f, ComboMaxLength = 5, ComboCommitment = 0.35f, InterruptDanger = 0.45f, PressureBias = 1.6f, CounterAfterDodgeChance = 0.4f, FeintReadSkill = 0.72f, FooledDuration = 0.38f,
                     MaxParriesBeforeFatigue = 5, FatigueDuration = 0.8f
                 },
                 ["Duelist"] = new SkillProfile
@@ -110,7 +110,7 @@ namespace CompetentAI.Core
                     RiposteChanceShift = 0.1f, RiposteDelayMul = 0.7f, AttackIntervalMul = 0.7f, AnimSpeedMul = 1.1f,
                     OneHandIK = true, OneHandIKPos = 0.25f, OneHandIKRot = 0.75f, SideDodge = true,
                     VarietyStrength = 1.0f, FeintChance = 0.3f, DoubleFeintChance = 0.1f, ReactiveFeintBoost = 2.0f,
-                    ComboChance = 0.4f, ComboMaxLength = 5, ComboCommitment = 0.2f, InterruptDanger = 0.35f, PressureBias = 2.0f, CounterAfterDodgeChance = 0.55f, FeintReadSkill = 0.85f, FooledDuration = 0.3f,
+                    ComboChance = 0.70f, ComboMaxLength = 6, ComboCommitment = 0.2f, InterruptDanger = 0.35f, PressureBias = 2.0f, CounterAfterDodgeChance = 0.55f, FeintReadSkill = 0.85f, FooledDuration = 0.3f,
                     MaxParriesBeforeFatigue = 6, FatigueDuration = 0.7f
                 }
             };

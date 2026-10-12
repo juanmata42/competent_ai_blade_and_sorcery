@@ -2,6 +2,15 @@
 
 Formato basado en *Keep a Changelog*. Versionado semántico (`ModVersion` del manifest).
 
+## [0.4.1] — 2026-10-12
+
+### Cambiado (a raíz de «hacen uno, se resetea la animación y hacen otro»)
+- **Encadenado suave**: los golpes de una secuencia (y la redirección de una finta) ya **no pasan por `StopAttack`** del juego, que reinicia la fuerza de los brazos y la animación; se lanza el siguiente directamente y el sistema de animación del juego (dos ranuras de inicio alternas) hace el fundido. Solo si no se puede parar limpiamente el `AttackWindow` anterior se vuelve al método antiguo.
+- **Sin cambios de postura entre ataques**: el director de variedad solo cambia la postura de guardia (los brazos se recolocan y el juego no deja atacar ≈0,8 s) cuando no hay ningún ataque disponible desde la postura actual.
+- **Más secuencias por defecto**: probabilidad de iniciar una Recruit 25 % / Soldier 40 % / Veteran 55 % / Duelist 70 % y longitudes hasta 3 / 4 / 5 / 6. En el log de la prueba solo habían peleado enemigos `HumanEasy` (= Recruit), que antes encadenaban con un 5 % y máximo 2 golpes.
+- Se prefiere con fuerza el seguimiento «escrito por los autores» para el ataque anterior (`AttackMotion.GetChainAttack`).
+- Log: cada fase de cada ataque (`stage WindUp/Attack/FollowThrough/End/Cancel …`) en nivel Debug, y `kata planned / kata step / kata ended` en nivel Info.
+
 ## [0.4.0] — 2026-10-12 (primera versión con datos reales del juego)
 
 ### Retirado

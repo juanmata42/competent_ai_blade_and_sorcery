@@ -27,8 +27,8 @@ namespace CompetentAI.Core.Tests
                 maxDuelist = System.Math.Max(maxDuelist, b);
                 minAll = System.Math.Min(minAll, System.Math.Min(a, b));
             }
-            Assert.Equal(2, maxRecruit);
-            Assert.Equal(5, maxDuelist);
+            Assert.Equal(3, maxRecruit);
+            Assert.Equal(6, maxDuelist);
             Assert.Equal(2, minAll);
             var capped = profiles["Duelist"].Clone();
             capped.ComboMaxLength = 6;
@@ -47,8 +47,8 @@ namespace CompetentAI.Core.Tests
                 if (KataPlanner.ShouldStart(profiles["Soldier"], rng)) soldier++;
                 if (KataPlanner.ShouldStart(profiles["Duelist"], rng)) duelist++;
             }
-            Assert.InRange(soldier / 5000.0, 0.12, 0.18);
-            Assert.InRange(duelist / 5000.0, 0.36, 0.44);
+            Assert.InRange(soldier / 5000.0, 0.36, 0.44);
+            Assert.InRange(duelist / 5000.0, 0.66, 0.74);
         }
 
         [Fact]
@@ -96,6 +96,23 @@ namespace CompetentAI.Core.Tests
             for (int i = 0; i < 6000; i++)
                 calm[KataPlanner.ChooseNext(prev, pool, mem, new VarietyConfig(), new KataConfig(), p, false, rng)]++;
             Assert.InRange(calm[2] / (double)calm[0], 0.85, 1.2); // no pressure: advancing is neutral
+        }
+
+        [Fact]
+        public void The_follow_up_authored_for_the_previous_attack_is_strongly_preferred()
+        {
+            var prev = C("A", CutDirection.Left);
+            var authored = C("authored", CutDirection.Right, chain: true);
+            authored.IsAuthoredFollowUp = true;
+            var pool = new List<AttackCandidate> { C("x", CutDirection.Right, chain: true), C("y", CutDirection.Right), authored };
+            var p = SkillProfile.CreateDefaults()["Soldier"];
+            var rng = new SystemRandomSource(17);
+            var mem = new AttackMemory(6);
+            int[] n = new int[3];
+            for (int i = 0; i < 6000; i++)
+                n[KataPlanner.ChooseNext(prev, pool, mem, new VarietyConfig(), new KataConfig(), p, false, rng)]++;
+            Assert.True(n[2] > n[0] * 2, $"authored {n[2]} vs other chain {n[0]}");
+            Assert.True(n[0] > n[1], "ordinary chain beats a plain opener");
         }
 
         [Fact]

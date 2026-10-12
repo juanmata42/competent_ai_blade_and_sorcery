@@ -19,7 +19,10 @@ namespace CompetentAI.Core
         public float StepRangeTolerance = 0.45f;
 
         /// <summary>Weight multiplier for the game's own follow-up attacks (chain attacks) as next step.</summary>
-        public float PrefersChains = 1.5f;
+        public float PrefersChains = 2.5f;
+
+        /// <summary>Extra weight for the follow-up the game's authors paired with the previous attack (AttackMotion.GetChainAttack).</summary>
+        public float AuthoredFollowUpBonus = 3f;
 
         /// <summary>Weight multiplier for attacks that advance (step/lunge) when pressing after a parry or inside a sequence.</summary>
         public float AdvanceBias = 1.25f;
@@ -28,7 +31,7 @@ namespace CompetentAI.Core
         public float PressureWindow = 1.5f;
 
         /// <summary>Probability to add one more step to a sequence, applied repeatedly up to the profile's maximum.</summary>
-        public float ExtendChance = 0.55f;
+        public float ExtendChance = 0.65f;
     }
 
     public static class KataPlanner
@@ -62,6 +65,7 @@ namespace CompetentAI.Core
                 if (previous != null && previous.Direction != CutDirection.Unknown && c.Direction != CutDirection.Unknown)
                     weight *= 0.6f + 0.4f * (Directions.Steps(previous.Direction, c.Direction) / 4f);
                 if (c.IsChain) weight *= cfg.PrefersChains;
+                if (c.IsAuthoredFollowUp) weight *= cfg.AuthoredFollowUpBonus;
                 if (c.Advances && pressing) weight *= cfg.AdvanceBias * p.PressureBias;
                 weight *= VarietyScorer.Freshness(c, memory, variety, p.VarietyStrength);
                 w[i] = weight;

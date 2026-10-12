@@ -15,7 +15,7 @@ Busca en `Player.log` tras llegar al menú principal:
 | Línea esperada | Significado |
 |---|---|
 | `[CompetentAI] API self-check OK (N members)` | Todas las piezas del juego que usa el mod existen |
-| `[CompetentAI] v0.4.0 loaded from '…\Mods\CompetentAI' (config found)` | El `ThunderScript` se instanció |
+| `[CompetentAI] v0.4.1 loaded from '…\Mods\CompetentAI' (config found)` | El `ThunderScript` se instanció |
 | `[CompetentAI] effective settings: enabled=True …` | Flags en vigor |
 | *(sin)* `[ModManager] … Incompatible with game version` ni errores `[ModManager][...][CompetentAI]` | Manifest correcto |
 
@@ -41,7 +41,7 @@ Para cada uno: lucha 1 contra 1 durante ~2 minutos, luego copia las líneas del 
 | B | NPC con **lanza** (`SpearBladed`) | **Ahora ataca** (antes, en cerebros de dificultad baja/media, no tenía ningún ataque): estocadas, estocada con paso y contra-estocada; riposte = estocada | `curation: … +N legitimate attack(s) the stock filter dropped only for difficulty`, `+CounterThrust (declared Swing, really Thrust)`, `synthesized=1 … +riposte CompetentRiposteThrust` |
 | C | NPC con **hacha larga/alabarda** (`AxeLongHalberd`) | Solo cortes (como de serie), sin estocadas | `curation: removed=…` (las estocadas que ya quitaba el juego no aparecen) |
 | D | NPC con **maza** (`MaceShortCommon`/`MaceLongMaul`) | Solo golpes, nunca estocadas | idem; clase `Mace` en la línea `weapon …` (Debug) |
-| E | NPC con **daga sin filo** (`DaggerSentaraStiletto`, `DaggerRaktaSai`) | **Nada de cortes**: solo estocadas (antes de v0.4.0 el mod les dejaba los cortes por una red de seguridad mal ordenada) | `curation: removed=… swing needs an edge or a blunt head (DaggerSentaraStiletto has neither)` |
+| E | NPC con **daga sin filo** (`DaggerSentaraStiletto`, `DaggerRaktaSai`) | **Nada de cortes**: solo estocadas (antes de v0.4.1 el mod les dejaba los cortes por una red de seguridad mal ordenada) | `curation: removed=… swing needs an edge or a blunt head (DaggerSentaraStiletto has neither)` |
 | F | NPC con **Viennoise sword** (`ViennoiseSword`) | Solo golpes (arma contundente), nunca estocadas | `thrust needs a point (ViennoiseSword has none)` |
 | G | **Arma modded** (cualquiera) | El NPC ataca igual que sin el mod (comportamiento conservador) | `weapon …[Unknown,None,… UNKNOWN]` en Debug; sin `removed` |
 | H | **Espada + escudo** | Empujes de escudo siguen funcionando; fintas y variedad en los cortes | `stance 'HumanMeleeShieldStance' …`; no debe haber `removed` de `Push*` |
@@ -59,7 +59,7 @@ Para cada uno: lucha 1 contra 1 durante ~2 minutos, luego copia las líneas del 
 | F3 | **NPC sufre tu finta** | Con un Recruit/Soldier: empieza un golpe, **cambia de dirección bruscamente** antes de impactar | A veces su guardia se queda donde estaba y recibe el golpe; a veces lo lee | `strike changed direction by NNN° -> Fooled` / `-> Read`; `fooled: commits to a dodge` |
 | F4 | **Fatiga** | Golpea al NPC repetidamente con golpes que él pare (4+ en 3 s) | Deja de parar ~1 s: queda abierto | `has parried too much …`, `overwhelmed: parry disabled` |
 | F5 | **Contra tras esquiva** | Ataca desde lejos para que esquive hacia atrás | Tras esquivar, a veces contraataca enseguida | `counter-attack after dodge` |
-| F6 | **Katas** | Nivel 4 (Duelist): deja que ataque sin pararlo y luego **para** sus golpes | Encadena 2–5 golpes seguidos aunque los pares; cada golpe parte de donde acabó el anterior (idealmente el corte contrario) | `kata planned: N strikes`, `kata step 2: A -> B`, `kata ended after N strike(s): completed` |
+| F6 | **Katas** (pon *Skill level* en 3 o 4 en el menú: con `Auto` los enemigos `HumanEasy` son Recruit y encadenan poco) | Nivel 4 (Duelist): deja que ataque sin pararlo y luego **para** sus golpes | Encadena 2–5 golpes seguidos aunque los pares; cada golpe parte de donde acabó el anterior (idealmente el corte contrario) | `kata planned: N strikes`, `kata step 2: A -> B`, `kata ended after N strike(s): completed` |
 | F6b | **Interrumpir una kata** | Con un Duelist/Veteran en plena secuencia, **lánzale un golpe fuerte** (acércale el arma rápido) | Corta la secuencia y se defiende; el nivel 1 (Recruit) sigue encadenando a ciegas y se come el golpe | `kata ended … interrupted: the opponent became dangerous` / `interrupted during wind-up of …` |
 | F6c | **Avance** | Aléjate 2–3 m | Algunos ataques salen con paso/zancada; tras parar un golpe, más probabilidad de ataque con avance | `windup … /advancing`; `measured … advances (0.xx m forward)` |
 | F7 | **Parada con IK** (Veteran/Duelist) | Mira sus brazos al parar un golpe con una sola arma | La hoja sale a tu golpe; **sin brazos retorcidos ni temblor** | `one-hand parry IK enabled for …`; si falla: `could not enable weapon-placement IK`. Efecto secundario esperado: su arma también **desvía hechizos** que le lances |
@@ -83,7 +83,7 @@ Prueba con los mods que uses (animaciones de ataque/parada, otros de IA). Anota 
 ## Plantilla de reporte (copia y rellena)
 
 ```
-Versión del mod: 0.4.0     Versión del juego:
+Versión del mod: 0.4.1     Versión del juego:
 Mods instalados (orden de carga):
 Escenario(s) probado(s) (A–J / F1–F9 / M1–M4):
 Resultado:  OK / PARCIAL / FALLA

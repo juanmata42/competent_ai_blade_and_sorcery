@@ -25,7 +25,7 @@ namespace CompetentAI.Mod
             new KeyValuePair<Type, string[]>(typeof(BrainModuleMelee), new[]
             {
                 "minMaxTimeBetweenAttack", "animationSpeedMultiplier", "recoilNothingRiposteChance", "minMaxRiposteDelay",
-                "maxRangeDelta", "attack", "lastAttack", "attackCount", "followingThrough", "StopAttack", "TriggerAttack",
+                "maxRangeDelta", "attack", "lastAttack", "attackCount", "attackWindow", "followingThrough", "StopAttack", "TriggerAttack",
                 "AttackTarget", "GetWeaponReach", "GetMeleeRanges", "GetBrainSpeedMultiplier"
             }),
             new KeyValuePair<Type, string[]>(typeof(BrainModuleStance), new[] { "OnStanceChange", "currentStanceData", "currentPose", "ChangeIdlePose", "switching" }),

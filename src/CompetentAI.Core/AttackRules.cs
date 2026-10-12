@@ -35,6 +35,8 @@ namespace CompetentAI.Core
         public bool Advances;
         /// <summary>The attack comes from the stance's chain (follow-up) list.</summary>
         public bool IsChain;
+        /// <summary>The game's own pairing: this is what AttackMotion.GetChainAttack returned for the previous attack.</summary>
+        public bool IsAuthoredFollowUp;
         public string SourceIdle = "Any";
 
         /// <summary>Opaque handle to the engine object (set by the integration layer).</summary>

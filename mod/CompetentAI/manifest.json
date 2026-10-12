@@ -2,6 +2,6 @@
   "Name": "Competent AI",
   "Description": "NPCs that defend, feint, counter and chain interruptible strike sequences in all nine attack angles, and only attack with what their weapon can really do. In-game menu with skill levels (Recruit, Soldier, Veteran, Duelist).",
   "Author": "juanm",
-  "ModVersion": "0.4.0",
+  "ModVersion": "0.4.1",
   "GameVersion": "1.0.0.0"
 }

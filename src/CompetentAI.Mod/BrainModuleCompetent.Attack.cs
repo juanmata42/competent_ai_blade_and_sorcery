@@ -132,6 +132,14 @@ namespace CompetentAI.Mod
                 _candScratch.Add(mi.Candidate);
             }
             if (_candScratch.Count == 0) return;
+            // Changing the guard pose between attacks is the visible "reset" (the arms re-arrange, and the game refuses to
+            // attack for ~0.8 s meanwhile): only do it when nothing is available from the current pose.
+            bool anyHere = false;
+            foreach (AttackCandidate c in _candScratch)
+                if (c.SourceIdle == "Any" || c.SourceIdle == poseId) { anyHere = true; break; }
+            if (anyHere)
+                for (int i = _candScratch.Count - 1; i >= 0; i--)
+                    if (_candScratch[i].SourceIdle != "Any" && _candScratch[i].SourceIdle != poseId) _candScratch.RemoveAt(i);
             if (_candScratch.Count == 1)
             {
                 // nothing to choose from; leave stock weights alone
@@ -177,6 +185,7 @@ namespace CompetentAI.Mod
             try
             {
                 AttackMotion atk = _melee.attack ?? _melee.lastAttack;
+                Log.Attack($"{_tag} stage {stage} {(atk != null ? atk.id : "-")} attackCount={_melee.attackCount} followingThrough={_melee.followingThrough}");
                 switch (stage)
                 {
                     case BrainModuleAttack.AttackStage.WindUp: OnWindUp(atk, targetCreature); break;
@@ -295,9 +304,49 @@ namespace CompetentAI.Mod
             Log.Attack($"{_tag} FEINT {first.id} -> {redirect.id}");
             _feintsInRow++;
             _pendingDouble = dbl; // read by OnWindUp of the redirected attack, which starts synchronously below
-            AbortAttack(first);
-            _melee.TriggerAttack(0f, redirect, _melee, target.transform);
+            ChainInto(first, redirect, target.transform, false, true); // cross-fades into the redirect instead of resetting
             _pendingDouble = false; // consumed by OnWindUp when the redirect started; never leave it armed otherwise
+        }
+
+        private static readonly System.Reflection.FieldInfo AttackWindowField =
+            typeof(BrainModuleMelee).GetField("attackWindow", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+        /// <summary>
+        /// Starts <paramref name="next"/> straight from the attack that is playing, WITHOUT calling the game's StopAttack.
+        /// StopAttack resets the arms' pin forces and the animation (the visible "reset" between strikes); the game's own
+        /// animation layer is built to cross-fade between consecutive one-shots (two alternating start slots), which is
+        /// what PlayAnimation does when an animation is already playing. Falls back to the stop-then-start path if the
+        /// running attack window cannot be stopped cleanly.
+        /// </summary>
+        private bool ChainInto(AttackMotion current, AttackMotion next, Transform target, bool chain, bool windowStillRunning)
+        {
+            if (windowStillRunning)
+            {
+                // The old AttackWindow coroutine would go on to apply its damage logic to the attack we are replacing.
+                bool stopped = false;
+                try
+                {
+                    if (AttackWindowField != null)
+                    {
+                        var running = AttackWindowField.GetValue(_melee) as Coroutine;
+                        if (running != null) _brain.StopCoroutine(running);
+                        AttackWindowField.SetValue(_melee, null);
+                        stopped = true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log.Debug_(_tag + " could not stop the attack window: " + ex.Message);
+                }
+                if (!stopped)
+                {
+                    AbortAttack(current);
+                    _melee.TriggerAttack(0f, next, _melee, target, chain);
+                    return false;
+                }
+            }
+            _melee.TriggerAttack(0f, next, _melee, target, chain);
+            return true;
         }
 
         /// <summary>Stops the running attack without letting our own End-stage handler treat it as a finished attack.</summary>

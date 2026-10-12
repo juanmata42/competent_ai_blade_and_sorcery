@@ -118,8 +118,8 @@ Each profile has the same fields. Defaults per archetype:
 | `FeintChance` | Chance per attack to start it as a feint. | 0 … 0.8 | 0 | 0.08 | 0.18 | 0.3 |
 | `DoubleFeintChance` | Chance that a feint is followed by a second feint. | 0 … 0.6 | 0 | 0 | 0.04 | 0.1 |
 | `ReactiveFeintBoost` | Multiplier on FeintChance when the target is guarding the zone the attack heads for. | 1 … 4 | 1.5 | 1.5 | 1.7 | 2 |
-| `ComboChance` | Chance, per opening attack, to turn it into a chained sequence (kata) of several strikes. | 0 … 0.9 | 0.05 | 0.15 | 0.28 | 0.4 |
-| `ComboMaxLength` | Longest sequence this archetype throws (total strikes, 2-6). | 2 … 6 | 2 | 3 | 4 | 5 |
+| `ComboChance` | Chance, per opening attack, to turn it into a chained sequence (kata) of several strikes. | 0 … 0.9 | 0.25 | 0.4 | 0.55 | 0.7 |
+| `ComboMaxLength` | Longest sequence this archetype throws (total strikes, 2-6). | 2 … 6 | 3 | 4 | 5 | 6 |
 | `ComboCommitment` | 0-1: how likely the creature is to keep chaining when the opponent starts a dangerous strike (high = blind commitment, low = breaks off to defend as soon as it is threatened).  | 0 … 1 | 0.9 | 0.6 | 0.35 | 0.2 |
 | `InterruptDanger` | Opponent strike danger level (0-1) from which a sequence may be interrupted. | 0.05 … 1 | 0.8 | 0.6 | 0.45 | 0.35 |
 | `PressureBias` | Weight multiplier for advancing attacks right after a successful parry (pressing the advantage). | 1 … 4 | 1 | 1.3 | 1.6 | 2 |

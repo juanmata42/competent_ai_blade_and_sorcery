@@ -257,7 +257,8 @@ namespace CompetentAI.Core
 
             Katas.HardMaxLength = Math.Max(2, Math.Min(Katas.HardMaxLength, 8));
             Katas.StepRangeTolerance = Clamp(Katas.StepRangeTolerance, 0.1f, 1.5f);
-            Katas.PrefersChains = Clamp(Katas.PrefersChains, 0.1f, 5f);
+            Katas.PrefersChains = Clamp(Katas.PrefersChains, 0.1f, 8f);
+            Katas.AuthoredFollowUpBonus = Clamp(Katas.AuthoredFollowUpBonus, 0.1f, 8f);
             Katas.AdvanceBias = Clamp(Katas.AdvanceBias, 0.1f, 5f);
             Katas.PressureWindow = Clamp(Katas.PressureWindow, 0f, 10f);
             Katas.ExtendChance = Clamp(Katas.ExtendChance, 0f, 0.95f);

@@ -40,7 +40,7 @@ namespace CompetentAI.Mod
             _kataStep = 0;
             _kataRemaining = length - 1;
             _gate.Reset();
-            Log.Attack($"{_tag} kata planned: {length} strikes, opening with {atk.id}");
+            Log.Info($"{_tag} kata planned: {length} strikes, opening with {atk.id} (profile {_profileName})");
             return true;
         }
 
@@ -65,9 +65,9 @@ namespace CompetentAI.Mod
 
             _kataRemaining--;
             _kataExpectStep = true;
-            Log.Attack($"{_tag} kata step {_kataStep + 1}: {atk.id} -> {next.id}");
-            AbortAttack(atk);
-            _melee.TriggerAttack(0f, next, _melee, target.transform, true);
+            Log.Info($"{_tag} kata step {_kataStep + 1}: {atk.id} -> {next.id}");
+            // The damage window of this strike just ended, so its coroutine is finishing on its own: no need to stop it.
+            ChainInto(atk, next, target.transform, true, false);
             if (_kataExpectStep)
             {
                 _kataExpectStep = false;
@@ -101,7 +101,7 @@ namespace CompetentAI.Mod
 
         private void EndKata(string why)
         {
-            if (_kataActive) Log.Attack($"{_tag} kata ended after {_kataStep + 1} strike(s): {why}");
+            if (_kataActive) Log.Info($"{_tag} kata ended after {_kataStep + 1} strike(s): {why}");
             _kataActive = false;
             _kataExpectStep = false;
             _kataRemaining = 0;
@@ -115,6 +115,10 @@ namespace CompetentAI.Mod
             string poseId = _stance.currentPose != null ? _stance.currentPose.id : "";
             TryInfo(prevMotion, out MotionInfo prevInfo);
 
+            // The follow-up the game's authors paired with the previous attack, if any.
+            MeleeStanceData md = _stance.currentStanceData as MeleeStanceData;
+            AttackMotion authored = prevMotion.GetChainAttack(poseId, prevMotion.attackSide, md != null && md.alternateAttackSides);
+
             _candScratch.Clear();
             foreach (AttackMotion m in _curatedData.chainAttacks)
             {
@@ -122,6 +126,7 @@ namespace CompetentAI.Mod
                 if (!TryInfo(m, out MotionInfo mi) || mi.Candidate.Kind == AttackKind.Bash) continue;
                 StanceCurator.RefreshDirection(mi, Runtime.Dirs);
                 mi.Candidate.IsChain = true;
+                mi.Candidate.IsAuthoredFollowUp = authored != null && authored.id == m.id;
                 mi.Candidate.Weight = mi.BaseWeight;
                 _candScratch.Add(mi.Candidate);
             }
@@ -132,6 +137,7 @@ namespace CompetentAI.Mod
                 if (!RangeFits(m, distance, tol)) continue;
                 StanceCurator.RefreshDirection(mi, Runtime.Dirs);
                 mi.Candidate.IsChain = false;
+                mi.Candidate.IsAuthoredFollowUp = false;
                 mi.Candidate.Weight = mi.BaseWeight;
                 _candScratch.Add(mi.Candidate);
             }
