@@ -4,19 +4,21 @@ Mod **solo para PC** (código C# sobre `ThunderRoad`, juego **1.3.1.260730005**)
 
 - **Atacan y defienden en nueve ángulos** (ocho cortes + estocada), con un director de ataques con memoria: se acabó el patrón A-B-A-B.
 - **Hacen fintas** (empiezan un ataque, lo abortan y lo redirigen) y **sufren fintas** (un cambio brusco de dirección del golpe del jugador puede dejar su guardia fuera de sitio).
-- **Contraatacan**: tras parar (ajuste de probabilidad/retraso de contra), tras esquivar y encadenando combos.
+- **Contraatacan**: tras parar (ajuste de probabilidad/retraso de contra) y tras esquivar.
+- **Encadenan secuencias de golpes tipo kata** (2–6 según el nivel) suponiendo que el primero será parado, eligiendo cada golpe para que fluya del anterior (el corte contrario es el retorno natural), **con y sin avance**, y **las interrumpen** si te vuelves peligroso: el novato se empeña a ciegas, el duelista corta la secuencia y defiende.
+- **Menú en el juego** (Opciones → Mods → *Competent AI*): activar/desactivar la IA del mod **en vivo** y elegir el **nivel de destreza** (Auto por tipo de enemigo, 1 Recruit, 2 Soldier, 3 Veteran, 4 Duelist) o desplazarlo.
 - **Solo atacan con lo que su arma puede hacer de verdad**: sin cortes con dagas sin filo, sin estocadas con armas romas, con lanzas que recuperan los ataques que el juego les quita por un error de datos.
 - Cuatro **arquetipos** configurables (Recruit, Soldier, Veteran, Duelist) asignados por Brain, facción o creatura, sin sobrescribir ningún catálogo ni parchear código del juego.
 - Todo es **desactivable por separado** (JSON y menú in-game), con **logging configurable** para diagnosticar.
 
-> Estado: **v0.1.0, sin probar en el juego** (no se puede ejecutar desde el entorno de desarrollo). Léelo antes de jugar: [docs/TESTING.md](docs/TESTING.md) tiene el plan de pruebas y la plantilla para reportar resultados.
+> Estado: **v0.2.0, sin probar en el juego** (no se puede ejecutar desde el entorno de desarrollo). Léelo antes de jugar: [docs/TESTING.md](docs/TESTING.md) tiene el plan de pruebas y la plantilla para reportar resultados.
 
 ## Instalar
 
-1. Compila (ver abajo) o toma `dist/CompetentAI-0.1.0.zip`.
+1. Compila (ver abajo) o toma `dist/CompetentAI-0.2.0.zip`.
 2. Copia la carpeta `CompetentAI` a `BladeAndSorcery_Data/StreamingAssets/Mods/` (debe quedar `.../Mods/CompetentAI/manifest.json`).
-3. Arranca el juego. En `BladeAndSorcery_Data/StreamingAssets/Logs/Player.log` busca las líneas `[CompetentAI]`: `API self-check OK`, `v0.1.0 loaded…`.
-4. Menú de opciones → pestaña Mods → *Competent AI* para activar/desactivar módulos. Detalles finos en `CompetentAI.config.json` (ver [docs/CONFIG.md](docs/CONFIG.md)).
+3. Arranca el juego. En `BladeAndSorcery_Data/StreamingAssets/Logs/Player.log` busca las líneas `[CompetentAI]`: `API self-check OK`, `v0.2.0 loaded…`.
+4. Menú de opciones → pestaña Mods → *Competent AI*: interruptor general, nivel de destreza y cada módulo por separado (actúan en vivo). Detalles finos en `CompetentAI.config.json` (ver [docs/CONFIG.md](docs/CONFIG.md)).
 
 ## Construir
 

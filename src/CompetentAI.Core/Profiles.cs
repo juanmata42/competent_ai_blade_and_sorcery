@@ -42,8 +42,19 @@ namespace CompetentAI.Core
         public float DoubleFeintChance = 0f;
         /// <summary>Multiplier on FeintChance when the target is guarding the zone the attack heads for.</summary>
         public float ReactiveFeintBoost = 1.5f;
-        /// <summary>Chance to follow an unparried attack with a chained one.</summary>
+        /// <summary>Chance, per opening attack, to turn it into a chained sequence (kata) of several strikes.</summary>
         public float ComboChance = 0f;
+        /// <summary>Longest sequence this archetype throws (total strikes, 2-6).</summary>
+        public int ComboMaxLength = 3;
+        /// <summary>
+        /// 0-1: how likely the creature is to keep chaining when the opponent starts a dangerous strike
+        /// (high = blind commitment, low = breaks off to defend as soon as it is threatened).
+        /// </summary>
+        public float ComboCommitment = 0.6f;
+        /// <summary>Opponent strike danger level (0-1) from which a sequence may be interrupted.</summary>
+        public float InterruptDanger = 0.6f;
+        /// <summary>Weight multiplier for advancing attacks right after a successful parry (pressing the advantage).</summary>
+        public float PressureBias = 1.3f;
         /// <summary>Chance to counter-attack right after a successful dodge.</summary>
         public float CounterAfterDodgeChance = 0f;
 
@@ -72,7 +83,7 @@ namespace CompetentAI.Core
                 {
                     ParryAdjustSpeedMul = 0.85f, AboutToBeHitMul = 0.9f, DodgeChanceMul = 0.8f,
                     RiposteChanceShift = -0.05f, RiposteDelayMul = 1.25f, AttackIntervalMul = 1.2f, AnimSpeedMul = 0.95f,
-                    VarietyStrength = 0.5f, FeintChance = 0.00f, DoubleFeintChance = 0f, ComboChance = 0.05f,
+                    VarietyStrength = 0.5f, FeintChance = 0.00f, DoubleFeintChance = 0f, ComboChance = 0.05f, ComboMaxLength = 2, ComboCommitment = 0.9f, InterruptDanger = 0.8f, PressureBias = 1.0f,
                     CounterAfterDodgeChance = 0.10f, FeintReadSkill = 0.25f, FooledDuration = 0.55f,
                     MaxParriesBeforeFatigue = 3, FatigueDuration = 1.1f
                 },
@@ -80,7 +91,7 @@ namespace CompetentAI.Core
                 {
                     ParryAdjustSpeedMul = 1.1f, AboutToBeHitMul = 1.0f, DodgeChanceMul = 1.0f,
                     RiposteChanceShift = 0.0f, RiposteDelayMul = 1.0f, AttackIntervalMul = 1.0f, AnimSpeedMul = 1.0f,
-                    VarietyStrength = 0.8f, FeintChance = 0.08f, DoubleFeintChance = 0.0f, ComboChance = 0.15f,
+                    VarietyStrength = 0.8f, FeintChance = 0.08f, DoubleFeintChance = 0.0f, ComboChance = 0.15f, ComboMaxLength = 3, ComboCommitment = 0.6f, InterruptDanger = 0.6f, PressureBias = 1.3f,
                     CounterAfterDodgeChance = 0.25f, FeintReadSkill = 0.5f, FooledDuration = 0.45f,
                     MaxParriesBeforeFatigue = 4, FatigueDuration = 0.9f
                 },
@@ -90,7 +101,7 @@ namespace CompetentAI.Core
                     RiposteChanceShift = 0.05f, RiposteDelayMul = 0.85f, AttackIntervalMul = 0.85f, AnimSpeedMul = 1.05f,
                     OneHandIK = true, OneHandIKPos = 0.15f, OneHandIKRot = 0.6f,
                     VarietyStrength = 1.0f, FeintChance = 0.18f, DoubleFeintChance = 0.04f, ReactiveFeintBoost = 1.7f,
-                    ComboChance = 0.28f, CounterAfterDodgeChance = 0.4f, FeintReadSkill = 0.72f, FooledDuration = 0.38f,
+                    ComboChance = 0.28f, ComboMaxLength = 4, ComboCommitment = 0.35f, InterruptDanger = 0.45f, PressureBias = 1.6f, CounterAfterDodgeChance = 0.4f, FeintReadSkill = 0.72f, FooledDuration = 0.38f,
                     MaxParriesBeforeFatigue = 5, FatigueDuration = 0.8f
                 },
                 ["Duelist"] = new SkillProfile
@@ -99,7 +110,7 @@ namespace CompetentAI.Core
                     RiposteChanceShift = 0.1f, RiposteDelayMul = 0.7f, AttackIntervalMul = 0.7f, AnimSpeedMul = 1.1f,
                     OneHandIK = true, OneHandIKPos = 0.25f, OneHandIKRot = 0.75f, SideDodge = true,
                     VarietyStrength = 1.0f, FeintChance = 0.3f, DoubleFeintChance = 0.1f, ReactiveFeintBoost = 2.0f,
-                    ComboChance = 0.4f, CounterAfterDodgeChance = 0.55f, FeintReadSkill = 0.85f, FooledDuration = 0.3f,
+                    ComboChance = 0.4f, ComboMaxLength = 5, ComboCommitment = 0.2f, InterruptDanger = 0.35f, PressureBias = 2.0f, CounterAfterDodgeChance = 0.55f, FeintReadSkill = 0.85f, FooledDuration = 0.3f,
                     MaxParriesBeforeFatigue = 6, FatigueDuration = 0.7f
                 }
             };
@@ -122,6 +133,10 @@ namespace CompetentAI.Core
             DoubleFeintChance = Clamp(DoubleFeintChance, 0f, 0.6f);
             ReactiveFeintBoost = Clamp(ReactiveFeintBoost, 1f, 4f);
             ComboChance = Clamp(ComboChance, 0f, 0.9f);
+            ComboMaxLength = Math.Max(2, Math.Min(ComboMaxLength, 6));
+            ComboCommitment = Clamp(ComboCommitment, 0f, 1f);
+            InterruptDanger = Clamp(InterruptDanger, 0.05f, 1f);
+            PressureBias = Clamp(PressureBias, 1f, 4f);
             CounterAfterDodgeChance = Clamp(CounterAfterDodgeChance, 0f, 0.95f);
             FeintReadSkill = Clamp(FeintReadSkill, 0f, 0.98f);
             FooledDuration = Clamp(FooledDuration, 0.05f, 1.5f);

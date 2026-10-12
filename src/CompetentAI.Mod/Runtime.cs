@@ -12,12 +12,14 @@ namespace CompetentAI.Mod
         public bool Enabled, ProfileTuning, WeaponRules, Variety, Feints, Combos, DefenseReading, CounterAfterDodge,
             OneHandIK, SideDodge, Calibration;
         public int LevelShift;
+        /// <summary>0 = Auto (per brain); 1..4 forces Ladder[level-1] for every NPC.</summary>
+        public int SkillLevel;
 
         public bool SameAs(EffectiveFlags o) =>
             o != null && Enabled == o.Enabled && ProfileTuning == o.ProfileTuning && WeaponRules == o.WeaponRules &&
             Variety == o.Variety && Feints == o.Feints && Combos == o.Combos && DefenseReading == o.DefenseReading &&
             CounterAfterDodge == o.CounterAfterDodge && OneHandIK == o.OneHandIK && SideDodge == o.SideDodge &&
-            Calibration == o.Calibration && LevelShift == o.LevelShift;
+            Calibration == o.Calibration && LevelShift == o.LevelShift && SkillLevel == o.SkillLevel;
     }
 
     /// <summary>Process-wide state shared by every creature controller.</summary>
@@ -66,7 +68,8 @@ namespace CompetentAI.Mod
                 OneHandIK = m.OneHandIK && ModOptions.OneHandIK,
                 SideDodge = m.SideDodge && ModOptions.SideDodge,
                 Calibration = m.Calibration && ModOptions.Calibration,
-                LevelShift = ModOptions.DifficultyShift
+                LevelShift = ModOptions.DifficultyShift,
+                SkillLevel = ModOptions.SkillLevel
             };
             bool changed = !f.SameAs(Flags);
             Flags = f;
@@ -83,7 +86,7 @@ namespace CompetentAI.Mod
         public static string Describe(EffectiveFlags f) =>
             $"enabled={f.Enabled} tuning={f.ProfileTuning} rules={f.WeaponRules} variety={f.Variety} feints={f.Feints} combos={f.Combos} " +
             $"defenseReading={f.DefenseReading} counterAfterDodge={f.CounterAfterDodge} ik={f.OneHandIK} sideDodge={f.SideDodge} " +
-            $"calibration={f.Calibration} shift={f.LevelShift}";
+            $"calibration={f.Calibration} shift={f.LevelShift} skillLevel={(f.SkillLevel == 0 ? "auto" : f.SkillLevel.ToString())}";
 
         private static DirectionCalibration LoadCalibration()
         {

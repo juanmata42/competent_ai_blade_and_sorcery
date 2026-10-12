@@ -15,12 +15,22 @@ Busca en `Player.log` tras llegar al menú principal:
 | Línea esperada | Significado |
 |---|---|
 | `[CompetentAI] API self-check OK (N members)` | Todas las piezas del juego que usa el mod existen |
-| `[CompetentAI] v0.1.0 loaded from '…\Mods\CompetentAI' (config found)` | El `ThunderScript` se instanció |
+| `[CompetentAI] v0.2.0 loaded from '…\Mods\CompetentAI' (config found)` | El `ThunderScript` se instanció |
 | `[CompetentAI] effective settings: enabled=True …` | Flags en vigor |
 | *(sin)* `[ModManager] … Incompatible with game version` ni errores `[ModManager][...][CompetentAI]` | Manifest correcto |
 
 Si el autochequeo dice `FAILED … missing X`: copia esa línea completa; el mod se auto-desactiva (el juego queda como de serie).
-En el menú de opciones debe aparecer la sección **Competent AI** (Mods) con 13 opciones.
+En el menú de opciones debe aparecer la sección **Competent AI** (Mods) con 14 opciones.
+
+## 1b. Menú en el juego (3 min) — *imprescindible*
+Opciones → Mods → **Competent AI**. Debe verse (en este orden): *Competent AI*, *Skill level*, *Skill shift*, *Chained strikes (katas)*, *Feints*, *Falling for feints / fatigue*, *Counter after dodge*, *Attack variety*, *Weapon rules*, *Skill tuning*, *Active weapon parry*, *Sidestep dodge*, *Measure attack directions*, *Log level*.
+
+| # | Prueba | Debe pasar | Log |
+|---|---|---|---|
+| M1 | Con NPCs peleando, pon *Competent AI* en OFF | En ≤ 1 s dejan de fintar/encadenar y vuelven al comportamiento del juego; en ON vuelven | `effective settings: enabled=False …` / `enabled=True …` |
+| M2 | *Skill level* = 1 Recruit y luego 4 Duelist con NPCs vivos | Los NPC cambian de nivel **sin respawn**: el Duelist es claramente más rápido, finta y encadena más | `skill level Veteran -> Recruit (menu)` por NPC |
+| M3 | *Skill level* = Auto, *Skill shift* +2 / −2 | Todo sube/baja de nivel | `skill level … (menu)` |
+| M4 | Apaga *Chained strikes* con una secuencia en curso | La secuencia se corta y no vuelven a verse encadenados | `kata ended … module off` |
 
 ## 2. Escenarios por arma
 Para cada uno: lucha 1 contra 1 durante ~2 minutos, luego copia las líneas del log. Qué mirar:
@@ -49,7 +59,9 @@ Para cada uno: lucha 1 contra 1 durante ~2 minutos, luego copia las líneas del 
 | F3 | **NPC sufre tu finta** | Con un Recruit/Soldier: empieza un golpe, **cambia de dirección bruscamente** antes de impactar | A veces su guardia se queda donde estaba y recibe el golpe; a veces lo lee | `strike changed direction by NNN° -> Fooled` / `-> Read`; `fooled: commits to a dodge` |
 | F4 | **Fatiga** | Golpea al NPC repetidamente con golpes que él pare (4+ en 3 s) | Deja de parar ~1 s: queda abierto | `has parried too much …`, `overwhelmed: parry disabled` |
 | F5 | **Contra tras esquiva** | Ataca desde lejos para que esquive hacia atrás | Tras esquivar, a veces contraataca enseguida | `counter-attack after dodge` |
-| F6 | **Combos** | Deja que ataque sin pararlo | A veces encadena 2.º ataque sin pausa | `combo A -> B` |
+| F6 | **Katas** | Nivel 4 (Duelist): deja que ataque sin pararlo y luego **para** sus golpes | Encadena 2–5 golpes seguidos aunque los pares; cada golpe parte de donde acabó el anterior (idealmente el corte contrario) | `kata planned: N strikes`, `kata step 2: A -> B`, `kata ended after N strike(s): completed` |
+| F6b | **Interrumpir una kata** | Con un Duelist/Veteran en plena secuencia, **lánzale un golpe fuerte** (acércale el arma rápido) | Corta la secuencia y se defiende; el nivel 1 (Recruit) sigue encadenando a ciegas y se come el golpe | `kata ended … interrupted: the opponent became dangerous` / `interrupted during wind-up of …` |
+| F6c | **Avance** | Aléjate 2–3 m | Algunos ataques salen con paso/zancada; tras parar un golpe, más probabilidad de ataque con avance | `windup … /advancing`; `measured … advances (0.xx m forward)` |
 | F7 | **Parada con IK** (Veteran/Duelist) | Mira sus brazos al parar un golpe con una sola arma | La hoja sale a tu golpe; **sin brazos retorcidos ni temblor** | `one-hand parry IK enabled for …`; si falla: `could not enable weapon-placement IK`. Efecto secundario esperado: su arma también **desvía hechizos** que le lances |
 | F8 | **Esquiva lateral** (Duelist) | Ataca con una estocada a un Duelist (`HumanVIP`) | Puede apartarse de lado (si la animación existe) | `tuning applied … side=True` |
 | F9 | **Direcciones medidas** | Tras ~20 ataques revisa `calibration.json` | Contiene una entrada por ataque con su dirección | `measured SwingTopToLeft: DownLeft (travel …)` |
@@ -71,9 +83,9 @@ Prueba con los mods que uses (animaciones de ataque/parada, otros de IA). Anota 
 ## Plantilla de reporte (copia y rellena)
 
 ```
-Versión del mod: 0.1.0     Versión del juego:
+Versión del mod: 0.2.0     Versión del juego:
 Mods instalados (orden de carga):
-Escenario(s) probado(s) (A–J / F1–F9):
+Escenario(s) probado(s) (A–J / F1–F9 / M1–M4):
 Resultado:  OK / PARCIAL / FALLA
 Qué esperaba:
 Qué pasó:

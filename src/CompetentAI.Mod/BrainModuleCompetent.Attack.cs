@@ -37,6 +37,8 @@ namespace CompetentAI.Mod
         private bool _counterRolled;
 
         // calibration sampling
+        private Vector3 _advStart;
+        private bool _advTracking;
         private Collider _calCollider;
         private Vector3 _calStart;
         private bool _calHasStart;
@@ -75,7 +77,7 @@ namespace CompetentAI.Mod
         {
             if (m == null) { mi = null; return false; }
             if (_infos.TryGetValue(m, out mi)) return true;
-            mi = StanceCurator.MakeInfo(m, Runtime.Rules, Runtime.Dirs);
+            mi = StanceCurator.MakeInfo(m, Runtime.Rules, Runtime.Dirs, _curatedData != null && _curatedData.chainAttacks.Contains(m));
             _infos[m] = mi;
             return true;
         }
@@ -123,6 +125,8 @@ namespace CompetentAI.Mod
                 StanceCurator.RefreshDirection(mi, Runtime.Dirs);
                 float w = mi.BaseWeight;
                 if (m.sourceIdle != "Any" && m.sourceIdle != poseId) w *= 0.35f; // switching pose costs ~0.8 s
+                if (mi.Candidate.Advances && now - _lastParryTime < Runtime.Cfg.Katas.PressureWindow)
+                    w *= Runtime.Cfg.Katas.AdvanceBias * _profile.PressureBias; // just parried: press the advantage
                 mi.Candidate.Weight = w;
                 _candScratch.Add(mi.Candidate);
             }
@@ -205,8 +209,14 @@ namespace CompetentAI.Mod
             bool forced = _pendingDouble;
             _pendingDouble = false;
             string feintInfo = "";
+            _advStart = creature.transform.position;
+            _advTracking = true;
 
-            if (Runtime.Flags.Feints && target != null && target.state == Creature.State.Alive)
+            // Follow-ups of a sequence are never feints (the sequence is its own commitment); a plain attack may start one.
+            bool followUp = _kataExpectStep;
+            if (followUp) KataWindUp(atk, target, out _);
+
+            if (!followUp && Runtime.Flags.Feints && target != null && target.state == Creature.State.Alive)
             {
                 FeintPlan plan;
                 if (forced)
@@ -237,7 +247,12 @@ namespace CompetentAI.Mod
                     feintInfo = $" FEINT({plan.Why}) at +{window * plan.CancelFraction:0.00}s{(plan.Double ? " double" : "")}";
                 }
             }
-            Log.Attack($"{_tag} windup {atk.id} [{mi.Candidate.Kind}/{mi.Candidate.Direction}/{mi.DirectionSource}] window={window:0.00}s{feintInfo}");
+            if (!followUp)
+            {
+                if (_feintFor == atk) _kataActive = false; // a feint and a sequence do not mix
+                else KataWindUp(atk, target, out _);
+            }
+            Log.Attack($"{_tag} windup {atk.id} [{mi.Candidate.Kind}/{mi.Candidate.Direction}/{mi.DirectionSource}{(mi.Candidate.Advances ? "/advancing" : "")}] window={window:0.00}s{feintInfo}");
         }
 
         private void OnAttackEnd(AttackMotion atk, Creature target)
@@ -246,22 +261,7 @@ namespace CompetentAI.Mod
             if (_feintFor == atk) return; // a feint is handled by FeintTick
             _feintsInRow = 0;
 
-            if (!Runtime.Flags.Combos || _profile.ComboChance <= 0f || atk == null) return;
-            if (target == null || target.state != Creature.State.Alive) return;
-            if (_melee.attack != atk || !_brain.isAttacking || _brain.currentStagger != Brain.Stagger.None || _melee.followingThrough) return;
-            if (_rng.Value() >= _profile.ComboChance) return;
-
-            _melee.GetMeleeRanges(out float min, out float max, true);
-            if (DistanceTo(target) > max + 0.4f) return;
-
-            MeleeStanceData md = _stance.currentStanceData as MeleeStanceData;
-            string poseId = _stance.currentPose != null ? _stance.currentPose.id : "";
-            AttackMotion chain = atk.GetChainAttack(poseId, atk.attackSide, md != null && md.alternateAttackSides);
-            if (chain == null || chain.animationClip == null) return;
-
-            Log.Attack($"{_tag} combo {atk.id} -> {chain.id}");
-            AbortAttack(atk);
-            _melee.TriggerAttack(0f, chain, _melee, target.transform, true);
+            KataAttackEnd(atk, target);
         }
 
         // ---------------------------------------------------------------- feints
@@ -290,6 +290,7 @@ namespace CompetentAI.Mod
                 return;
             }
 
+            EndKata("feint");
             Log.Attack($"{_tag} FEINT {first.id} -> {redirect.id}");
             _feintsInRow++;
             _pendingDouble = dbl; // read by OnWindUp of the redirected attack, which starts synchronously below
@@ -383,6 +384,20 @@ namespace CompetentAI.Mod
             return true;
         }
 
+        /// <summary>Records whether the animation moved the body forward (root motion), to tell stepping attacks from standing ones.</summary>
+        private void MeasureAdvance(AttackMotion atk)
+        {
+            if (!_advTracking) return;
+            _advTracking = false;
+            float forward = Vector3.Dot(creature.transform.position - _advStart, creature.transform.forward);
+            bool advanced = forward > 0.4f;
+            Runtime.Calibration.AddAdvance(atk.address, advanced);
+            Runtime.Calibration.AddAdvance(atk.id, advanced);
+            Runtime.CalibrationDirty = true;
+            Runtime.CalibrationRevision++;
+            Log.Debug_($"{_tag} measured {atk.id}: {(advanced ? "advances" : "stays")} ({forward:0.00} m forward)");
+        }
+
         private void CalibrationBegin(AttackMotion atk)
         {
             _calHasStart = false;
@@ -401,6 +416,7 @@ namespace CompetentAI.Mod
             _calHasStart = false;
             Vector3 end = creature.transform.InverseTransformPoint(_calCollider.transform.position);
             Vector3 motion = end - _calStart;
+            MeasureAdvance(atk);
             if (motion.magnitude < Directions.MinMeasurableTravel) return;
 
             CutDirection d = Directions.Classify(new Vec3(motion.x, motion.y, motion.z));

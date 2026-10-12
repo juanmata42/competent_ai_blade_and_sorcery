@@ -2,6 +2,14 @@
 
 Formato basado en *Keep a Changelog*. Versionado semántico (`ModVersion` del manifest).
 
+## [0.2.0] — 2026-10-12 (sin probar en el juego)
+
+### Añadido
+- **Secuencias de golpes encadenados (katas)** interrumpibles: longitud por nivel (Recruit 2 … Duelist 5, máx. 6), primer golpe asumiendo que será parado, siguientes golpes elegidos por fluidez de dirección (el corte contrario es el retorno natural), preferencia por los ataques de seguimiento del propio juego y por los que avanzan; interrupción por *episodio de peligro* con compromiso por nivel (el novato casi nunca corta, el duelista casi siempre), también durante el armado de un golpe de seguimiento. Sustituye al antiguo combo de un solo golpe. Parámetros nuevos: `Profiles.*.ComboMaxLength/ComboCommitment/InterruptDanger/PressureBias`, sección `Katas`.
+- **Ataques con avance** (paso/estocada con zancada) reconocidos por nombre y **medidos** (desplazamiento del cuerpo durante el ataque), con presión: tras parar con éxito se favorecen los ataques que avanzan.
+- **Menú en el juego** rehecho: interruptor general *Competent AI*, **Skill level** (Auto / 1 Recruit / 2 Soldier / 3 Veteran / 4 Duelist) y desplazamiento, ambos **en vivo** sobre los NPCs ya presentes; el resto de módulos también en vivo.
+- 114 tests.
+
 ## [0.1.0] — 2026-10-12 (primera versión, sin probar en el juego)
 
 ### Añadido

@@ -9,7 +9,7 @@
 | `Modules.WeaponRules` | true | true/false | Filter attacks by what the weapon can really do (edge / point / blunt head). |
 | `Modules.Variety` | true | true/false | Choose attacks with memory (no more A-B-A-B) and steer the stance to match. |
 | `Modules.Feints` | true | true/false | NPCs start attacks they abort and redirect (feints). |
-| `Modules.Combos` | true | true/false | NPCs chain a second attack after an unparried one. |
+| `Modules.Combos` | true | true/false | NPCs chain several strikes into an interruptible sequence (kata), assuming the first will be parried. |
 | `Modules.DefenseReading` | true | true/false | NPCs can fall for (or read) the target's feints and get overwhelmed by sustained parrying. |
 | `Modules.CounterAfterDodge` | true | true/false | NPCs counter-attack right after a successful dodge. |
 | `Modules.OneHandIK` | true | true/false | Allow archetypes to enable active weapon placement while parrying (stock: off). |
@@ -117,7 +117,11 @@ Each profile has the same fields. Defaults per archetype:
 | `FeintChance` | Chance per attack to start it as a feint. | 0 … 0.8 | 0 | 0.08 | 0.18 | 0.3 |
 | `DoubleFeintChance` | Chance that a feint is followed by a second feint. | 0 … 0.6 | 0 | 0 | 0.04 | 0.1 |
 | `ReactiveFeintBoost` | Multiplier on FeintChance when the target is guarding the zone the attack heads for. | 1 … 4 | 1.5 | 1.5 | 1.7 | 2 |
-| `ComboChance` | Chance to follow an unparried attack with a chained one. | 0 … 0.9 | 0.05 | 0.15 | 0.28 | 0.4 |
+| `ComboChance` | Chance, per opening attack, to turn it into a chained sequence (kata) of several strikes. | 0 … 0.9 | 0.05 | 0.15 | 0.28 | 0.4 |
+| `ComboMaxLength` | Longest sequence this archetype throws (total strikes, 2-6). | 2 … 6 | 2 | 3 | 4 | 5 |
+| `ComboCommitment` | 0-1: how likely the creature is to keep chaining when the opponent starts a dangerous strike (high = blind commitment, low = breaks off to defend as soon as it is threatened).  | 0 … 1 | 0.9 | 0.6 | 0.35 | 0.2 |
+| `InterruptDanger` | Opponent strike danger level (0-1) from which a sequence may be interrupted. | 0.05 … 1 | 0.8 | 0.6 | 0.45 | 0.35 |
+| `PressureBias` | Weight multiplier for advancing attacks right after a successful parry (pressing the advantage). | 1 … 4 | 1 | 1.3 | 1.6 | 2 |
 | `CounterAfterDodgeChance` | Chance to counter-attack right after a successful dodge. | 0 … 0.95 | 0.1 | 0.25 | 0.4 | 0.55 |
 | `FeintReadSkill` | Probability of NOT falling for a feint of the target. | 0 … 0.98 | 0.25 | 0.5 | 0.72 | 0.85 |
 | `FooledDuration` | Seconds the guard stays frozen when fooled. | 0.05 … 1.5 | 0.55 | 0.45 | 0.38 | 0.3 |

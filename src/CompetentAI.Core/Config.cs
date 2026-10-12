@@ -28,7 +28,7 @@ namespace CompetentAI.Core
         public bool Variety = true;
         /// <summary>NPCs start attacks they abort and redirect (feints).</summary>
         public bool Feints = true;
-        /// <summary>NPCs chain a second attack after an unparried one.</summary>
+        /// <summary>NPCs chain several strikes into an interruptible sequence (kata), assuming the first will be parried.</summary>
         public bool Combos = true;
         /// <summary>NPCs can fall for (or read) the target's feints and get overwhelmed by sustained parrying.</summary>
         public bool DefenseReading = true;
@@ -194,6 +194,7 @@ namespace CompetentAI.Core
         public RulesConfig Rules = new RulesConfig();
         public VarietyConfig Variety = new VarietyConfig();
         public FeintConfig Feints = new FeintConfig();
+        public KataConfig Katas = new KataConfig();
         public DefenseConfig Defense = new DefenseConfig();
         public CalibrationConfig Calibration = new CalibrationConfig();
         public LoggingConfig Logging = new LoggingConfig();
@@ -206,6 +207,7 @@ namespace CompetentAI.Core
             Rules = Rules ?? new RulesConfig();
             Variety = Variety ?? new VarietyConfig();
             Feints = Feints ?? new FeintConfig();
+            Katas = Katas ?? new KataConfig();
             Defense = Defense ?? new DefenseConfig();
             Calibration = Calibration ?? new CalibrationConfig();
             Logging = Logging ?? new LoggingConfig();
@@ -249,6 +251,13 @@ namespace CompetentAI.Core
             Feints.CancelFractionMax = Clamp(Feints.CancelFractionMax, Feints.CancelFractionMin, 0.95f);
             Feints.ChainDecay = Clamp(Feints.ChainDecay, 0f, 1f);
             Feints.MaxTargetDistance = Clamp(Feints.MaxTargetDistance, 1f, 12f);
+
+            Katas.HardMaxLength = Math.Max(2, Math.Min(Katas.HardMaxLength, 8));
+            Katas.StepRangeTolerance = Clamp(Katas.StepRangeTolerance, 0.1f, 1.5f);
+            Katas.PrefersChains = Clamp(Katas.PrefersChains, 0.1f, 5f);
+            Katas.AdvanceBias = Clamp(Katas.AdvanceBias, 0.1f, 5f);
+            Katas.PressureWindow = Clamp(Katas.PressureWindow, 0f, 10f);
+            Katas.ExtendChance = Clamp(Katas.ExtendChance, 0f, 0.95f);
 
             Defense.ReversalAngle = Clamp(Defense.ReversalAngle, 30f, 150f);
             Defense.ReversalWindow = Clamp(Defense.ReversalWindow, 0.1f, 1.5f);

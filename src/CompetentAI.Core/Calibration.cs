@@ -14,8 +14,31 @@ namespace CompetentAI.Core
         private Dictionary<string, Dictionary<string, int>> _votes =
             new Dictionary<string, Dictionary<string, int>>(StringComparer.OrdinalIgnoreCase);
 
+        [JsonProperty]
+        private Dictionary<string, int[]> _advance = new Dictionary<string, int[]>(StringComparer.OrdinalIgnoreCase);
+
         [JsonIgnore]
         public int Keys => _votes.Count;
+
+        /// <summary>Records whether an attack animation moved the body forward (root motion) when it was observed.</summary>
+        public void AddAdvance(string key, bool advanced)
+        {
+            if (string.IsNullOrEmpty(key)) return;
+            if (!_advance.TryGetValue(key, out int[] c)) _advance[key] = c = new int[2];
+            c[advanced ? 1 : 0]++;
+        }
+
+        public bool TryGetAdvance(string key, int minSamples, float agreement, out bool advances)
+        {
+            advances = false;
+            if (string.IsNullOrEmpty(key) || !_advance.TryGetValue(key, out int[] c)) return false;
+            int total = c[0] + c[1];
+            if (total < minSamples) return false;
+            int best = Math.Max(c[0], c[1]);
+            if ((float)best / total < agreement) return false;
+            advances = c[1] > c[0];
+            return true;
+        }
 
         public void Add(string key, CutDirection d)
         {

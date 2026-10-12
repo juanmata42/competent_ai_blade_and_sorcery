@@ -67,7 +67,10 @@ Arquetipos: **Recruit / Soldier / Veteran / Duelist**, asignación por `creatura
 ### 4b. Variedad (`AttackMemory`, `VarietyScorer`, `PlanNext`)
 - **Memoria** de los últimos N (6) ataques con su dirección. **Frescura** = producto de penalizaciones decrecientes con la antigüedad: mismo ataque ×0,12, misma dirección ×0,45, dirección vecina (45°) ×0,8, y ×1,4 si la dirección no aparece en memoria. Intensidad por arquetipo (`VarietyStrength`).
 - **Director**: tras cada ataque elige el siguiente entre los motions con rango válido (tolerancia = `maxRangeDelta`); amortigua el resto (×0,04) para orientar al selector de serie, y solo cambia la pose de guardia (`ChangeIdlePose`) si el ataque deseado exige otra y compensa (los de otra pose pesan ×0,35, porque el cambio bloquea ataques ≈0,8 s).
-- **Combos**: al final de un ataque sin parar/golpear, con `ComboChance`, se dispara su `chainAttack` (el del propio juego, ya filtrado por arma).
+- **Secuencias encadenadas ("katas")** (`KataPlanner`, `InterruptGate`, `BrainModuleCompetent.Kata`): al empezar un ataque se tira `ComboChance`; si sale, se planifica una longitud total de 2 a `ComboMaxLength` golpes (cada golpe extra con probabilidad `Katas.ExtendChance`). Al terminar la ventana de daño de cada golpe (`AttackStage.End`) se lanza el siguiente **sin esperar a ver si el anterior fue parado** (esa es la premisa de la kata). El siguiente se elige entre los ataques de seguimiento del stance y los openers viables a distancia (tolerancia `Katas.StepRangeTolerance`), puntuando: **fluidez** (0,6 + 0,4·pasos/4 respecto a la dirección anterior: el corte contrario es el mejor retorno), ×`PrefersChains` para los de seguimiento del juego, ×`AdvanceBias`·`PressureBias` para los que avanzan, y la frescura de la memoria. Nunca repite el ataque anterior.
+  - **Interrupción**: un `InterruptGate` decide **una vez por episodio de peligro** (`attackDangerLevel` ≥ `InterruptDanger`) si el NPC sigue (probabilidad `ComboCommitment`) o rompe la secuencia; se evalúa antes de lanzar cada golpe y también **durante el armado** de los golpes de seguimiento (antes de su ventana de daño), que se abortan con `StopAttack` para que la defensa de serie tome el relevo. Recruit: compromiso 0,9 / peligro 0,8 (casi nunca corta); Duelist: 0,2 / 0,35 (corta casi siempre).
+  - **Fin natural**: tropiezo/stagger, el objetivo muere, un golpe al cuerpo en un stance que no encadena sobre cuerpos, finta, o el módulo se apaga.
+- **Ataques con avance**: se marcan `Advances` por nombre (`step`, `lunge`, rango ≥ 1,8) y por **medición** del desplazamiento del cuerpo (> 0,4 m hacia delante entre el armado y el pico; ≥ 3 muestras coherentes). Los clips de serie con avance son: `RtLStep`, `LtRStep`, `TtLStep`, `TtLLunge`, `TtRLunge`, `LungeThrust` (y `SwingCombo`); no existen para el resto de direcciones. Tras una **parada con éxito** se favorecen durante `Katas.PressureWindow` los ataques que avanzan ("parar y avanzar").
 - **Fintas** (`FeintPlanner`): en el *wind-up* se decide (probabilidad por arquetipo; ×`ReactiveFeintBoost` si el arma del objetivo ya cubre la zona final del ataque; decae con fintas seguidas; no en empujones, estocadas con paso, ventanas < 0,28 s ni a más de 4 m). Se aborta entre el 35 % y el 70 % del tiempo previo al daño con `StopAttack` y se lanza otro ataque, **de dirección lo más distinta posible** (`ChooseRedirect`), con `TriggerAttack`. `DoubleFeintChance` encadena una segunda finta.
 - **Direcciones** (`Directions`, `DirectionResolver`): cada ataque tiene etiqueta de las 9, resuelta por (1) `Rules.DirectionOverrides`, (2) **medición** (posición de la punta del arma en el sistema local del atacante entre el inicio del daño y el pico; ≥3 muestras con ≥70 % de acuerdo), (3) pista del nombre (solo `RtL/LtR/TtL/TtR/Thrust`), (4) `Unknown` (neutral para la memoria).
 
@@ -77,6 +80,9 @@ Arquetipos: **Recruit / Soldier / Veteran / Duelist**, asignación por `creatura
 - **Fatiga de paradas** (`ParryFatigue`): `MaxParriesBeforeFatigue` paradas en `FatigueWindow` (3 s) dejan al NPC sin poder parar `FatigueDuration`: **no es imbatible**. Se re-afirma `parryEnabled=false` en cada tick porque el árbol de comportamiento lo reescribe en cada ciclo de IA; los eventos de parada se agrupan (0,15 s) porque una parada genera varios eventos de colisión.
 - **Contraataque**: (i) tras parar, mediante `RiposteChanceShift/RiposteDelayMul` (mecanismo del juego), (ii) **tras esquivar**: al terminar la esquiva, con `CounterAfterDodgeChance`, dentro de 2,6 m, sin cambio de pose en curso, dentro del ángulo de ataque y respetando el máximo de atacantes del grupo (`meleeMax`), `AttackTarget`, (iii) combos.
 - **Clasificación de golpe entrante**: `Directions.DefenderLocalToAttackerLocal` + `Zones` permiten etiquetar el golpe con las mismas 9 direcciones y llevarlo a la rejilla 3×3 → pose de guardia (`Zones.GuardPoseId`). *En esta versión se usa para las fintas reactivas y el log; la selección fina de pose sigue siendo la del juego (mezcla continua de las 7 guardias).*
+
+### 4d. Menú en el juego
+`ModOptions` (Opciones → Mods → *Competent AI*): **Competent AI** (interruptor general, en vivo), **Skill level** (Auto = por tipo de enemigo / 1 Recruit / 2 Soldier / 3 Veteran / 4 Duelist, en vivo: cada NPC recalcula su perfil y reaplica el ajuste), **Skill shift (Auto only)**, un interruptor por módulo y el nivel de log. El menú solo puede apagar lo que el JSON permite. `Weapon rules` actúa al siguiente desenfundado/aparición porque el filtrado va "cocido" en el clon del stance.
 
 ## 5. Configuración
 JSON (`CompetentAI.config.json`) con valores por defecto razonables, comentado, fusionable y recortado a rangos seguros; menú in-game que solo apaga. Ver [CONFIG.md](CONFIG.md).
@@ -92,7 +98,7 @@ Estrategia y análisis por mod en [COMPATIBILITY.md](COMPATIBILITY.md). Resumen:
 - Excepciones: nunca en el camino normal; el limitador de log evita inundar.
 
 ## 8. Plan de pruebas
-Unitarias (104, `dotnet test`) para toda la lógica pura, incl. el fichero de configuración distribuido y el manifest. Manuales: [TESTING.md](TESTING.md).
+Unitarias (114, `dotnet test`) para toda la lógica pura, incl. el fichero de configuración distribuido y el manifest. Manuales: [TESTING.md](TESTING.md).
 
 ## 9. Limitaciones conocidas y puntos NO VERIFICADOS
 | Punto | Estado |
@@ -104,6 +110,8 @@ Unitarias (104, `dotnet test`) para toda la lógica pura, incl. el fichero de co
 | Esquiva lateral | **NO VERIFICADO** que las animaciones `DodgeType` Left/Right existan/queden bien |
 | Cancelación de un ataque en el aire (finta) | Usa la API pública `StopAttack/TriggerAttack`, igual que hace el juego en sus propios ripostes; el aspecto visual (corte brusco de la animación) **NO VERIFICADO** |
 | Armas a dos manos usan animaciones de espada a una mano | Limitación del juego (stance 1H), no del mod |
-| Cambio de arquetipo en vivo | `GlobalLevelShift` del menú solo afecta a NPCs que aparecen después |
+| Cambio de arquetipo | Desde el menú es **en vivo**; los cambios de `Assignment`/`Profiles` del JSON necesitan reiniciar |
+| Parar en 8 direcciones *avanzando* | El juego no tiene clips de parada con paso; solo se modela la presión tras parar (favorecer ataques con avance) |
+| Ataques con avance por dirección | Solo existen clips con paso para Left, Right, DownLeft, DownRight y Thrust |
 | `ThunderScript.ScriptDisable/ScriptUnload` | Según el SDK no se invocan hoy; el mod limpia en `onLevelUnload` |
 | Compatibilidad con otros mods | Sin probar (ver COMPATIBILITY.md) |

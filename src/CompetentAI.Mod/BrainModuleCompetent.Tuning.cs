@@ -36,6 +36,13 @@ namespace CompetentAI.Mod
         private void SyncTuning(bool first)
         {
             EffectiveFlags f = Runtime.Flags;
+            if (f.SkillLevel != _appliedLevel || f.LevelShift != _appliedShift)
+            {
+                string before = _profileName;
+                RestoreTuning();      // re-applied below with the new profile
+                ChooseProfile();
+                if (before != _profileName) Log.Info($"{_tag} skill level {before} -> {_profileName} (menu)");
+            }
             bool wantTuning = f.Enabled && f.ProfileTuning;
             bool wantIk = wantTuning && f.OneHandIK && _profile.OneHandIK && !_ikFailed;
             bool wantSide = wantTuning && f.SideDodge && _profile.SideDodge;

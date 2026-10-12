@@ -56,7 +56,7 @@ namespace CompetentAI.Mod
             }
         }
 
-        public static MotionInfo MakeInfo(AttackMotion m, AttackRules rules, DirectionResolver dirs)
+        public static MotionInfo MakeInfo(AttackMotion m, AttackRules rules, DirectionResolver dirs, bool isChain = false)
         {
             AttackKind declared = MapKind(m.attackMotion);
             AttackKind kind = rules.ResolveKind(m.id, m.address, declared);
@@ -74,8 +74,21 @@ namespace CompetentAI.Mod
                 Tag = m
             };
             c.IsLunge = kind != AttackKind.Bash && rules.LooksLikeLunge(m.id, m.minRange);
+            c.IsChain = isChain;
+            c.Advances = kind != AttackKind.Bash && ResolveAdvance(rules, m.id, m.address, m.minRange);
             c.Direction = dirs.Resolve(m.id, m.address, kind, out string src);
             return new MotionInfo { Motion = m, Candidate = c, BaseWeight = m.weight, DirectionSource = src, DirectionRevision = Runtime.CalibrationRevision };
+        }
+
+        /// <summary>Measured root motion wins over the name hints (step / lunge).</summary>
+        private static bool ResolveAdvance(AttackRules rules, string id, string address, float minRange)
+        {
+            var cal = Runtime.Calibration;
+            var cfg = Runtime.Cfg.Calibration;
+            if (cal != null && (cal.TryGetAdvance(address, cfg.MinSamples, cfg.Agreement, out bool adv) ||
+                                cal.TryGetAdvance(id, cfg.MinSamples, cfg.Agreement, out adv)))
+                return adv;
+            return rules.LooksLikeAdvance(id, address, minRange);
         }
 
         /// <summary>Re-resolves the direction (e.g. after new measurements arrived).</summary>
@@ -83,6 +96,7 @@ namespace CompetentAI.Mod
         {
             if (mi.DirectionRevision == Runtime.CalibrationRevision) return; // nothing new measured since last resolve
             mi.DirectionRevision = Runtime.CalibrationRevision;
+            mi.Candidate.Advances = mi.Candidate.Kind != AttackKind.Bash && ResolveAdvance(Runtime.Rules, mi.Candidate.Id, mi.Candidate.Address, mi.Candidate.MinRange);
             mi.Candidate.Direction = dirs.Resolve(mi.Candidate.Id, mi.Candidate.Address, mi.Candidate.Kind, out string src);
             mi.DirectionSource = src;
         }
@@ -103,7 +117,7 @@ namespace CompetentAI.Mod
                 var removedNotes = new List<string>();
                 foreach (AttackMotion m in list)
                 {
-                    MotionInfo mi = MakeInfo(m, rules, dirs);
+                    MotionInfo mi = MakeInfo(m, rules, dirs, li == 1);
                     all.Add(mi);
                     RuleVerdict v = applyRules ? rules.Evaluate(right, left, mi.Candidate) : new RuleVerdict();
                     if (v.Allowed)
@@ -175,8 +189,10 @@ namespace CompetentAI.Mod
                 new KeyValuePair<List<AttackMotion>, List<AttackMotion>>(source.chainAttacks, data.chainAttacks),
                 new KeyValuePair<List<AttackMotion>, List<AttackMotion>>(source.ripostes, data.ripostes)
             };
+            int pairIndex = -1;
             foreach (var pair in pairs)
             {
+                pairIndex++;
                 foreach (AttackMotion src in pair.Key)
                 {
                     if (src == null || src.attackMotion == ItemModuleAI.AttackType.None) continue;
@@ -186,7 +202,7 @@ namespace CompetentAI.Mod
                         if (have.id == src.id) { present = true; break; }
                     if (present) continue;
 
-                    MotionInfo mi = MakeInfo(src, rules, dirs);
+                    MotionInfo mi = MakeInfo(src, rules, dirs, pairIndex == 1);
                     if (mi.Candidate.Kind == mi.Candidate.DeclaredKind || mi.Candidate.Kind == AttackKind.Unknown) continue;
                     WeaponProfile w = mi.Candidate.Side == Hand.Left ? left : right;
                     if (!ItemAllowsKind(w, mi.Candidate.Kind) || (mi.Candidate.Side == Hand.Both && !ItemAllowsKind(left, mi.Candidate.Kind))) continue;

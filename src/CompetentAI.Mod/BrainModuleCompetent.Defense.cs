@@ -88,7 +88,9 @@ namespace CompetentAI.Mod
         /// <summary>Called by the script when this creature's weapon successfully parried an enemy attack.</summary>
         public void OnParrySuccess()
         {
-            if (!_loaded || _disabled || !Runtime.Flags.Enabled || !Runtime.Flags.DefenseReading) return;
+            if (!_loaded || _disabled || !Runtime.Flags.Enabled) return;
+            _lastParryTime = Time.time; // used by the pressure bias of the attack director
+            if (!Runtime.Flags.DefenseReading) return;
             try
             {
                 float t = Time.time;

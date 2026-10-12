@@ -31,6 +31,10 @@ namespace CompetentAI.Core
         public float MaxRange;
         public float Weight = 1f;
         public bool IsLunge;
+        /// <summary>The attack moves the body forward (step / lunge variants).</summary>
+        public bool Advances;
+        /// <summary>The attack comes from the stance's chain (follow-up) list.</summary>
+        public bool IsChain;
         public string SourceIdle = "Any";
 
         /// <summary>Opaque handle to the engine object (set by the integration layer).</summary>
@@ -95,6 +99,13 @@ namespace CompetentAI.Core
             if (swingWord && !thrustWord) return AttackKind.Swing;
             if (thrustWord && !swingWord) return AttackKind.Thrust;
             return declared;
+        }
+
+        /// <summary>Name hints for attacks that advance. Measurements (see DirectionCalibration) supersede them.</summary>
+        public bool LooksLikeAdvance(string id, string address, float minRange)
+        {
+            string t = ((id ?? "") + "|" + (address ?? "")).ToLowerInvariant();
+            return t.Contains("step") || t.Contains("lunge") || minRange >= _cfg.LungeMinRange;
         }
 
         public bool LooksLikeLunge(string id, float minRange)

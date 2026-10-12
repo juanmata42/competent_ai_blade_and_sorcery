@@ -34,6 +34,10 @@ namespace CompetentAI.Mod
         private bool _loaded;
         private float _nextSync;
         private string _tag = "?";
+        private string _creatureId, _brainId;
+        private int _faction;
+        private float _noise;
+        private int _appliedLevel = -1, _appliedShift = int.MinValue;
 
         public BrainData Instance => _instance;
         public string ProfileName => _profileName;
@@ -66,17 +70,15 @@ namespace CompetentAI.Mod
                 string creatureId = creature.creatureId;
                 _tag = (creatureId ?? "?") + "#" + creature.GetInstanceID();
 
-                string name = Runtime.Resolver.ResolveName(creatureId, brainId, faction, _instance.difficulty);
-                if (Runtime.Flags.LevelShift != 0) name = Runtime.Resolver.Shift(name, Runtime.Flags.LevelShift);
-                _profileName = name;
+                _creatureId = creatureId;
+                _brainId = brainId;
+                _faction = faction;
                 int seed = creature.GetInstanceID() * 7919 + 13;
                 _rng = new SystemRandomSource(seed);
-                float noise = ((seed & 0xFFFF) / 65535f);
-                _profile = Runtime.Resolver.Get(name).WithJitter(noise);
+                _noise = ((seed & 0xFFFF) / 65535f);
+                ChooseProfile();
 
                 _memory = new AttackMemory(Runtime.Cfg.Variety.Memory);
-                _reader = new FeintReader(_profile, Runtime.Cfg.Defense, _rng);
-                _fatigue = new ParryFatigue(_profile);
                 _tracker = new StrikeTracker();
 
                 _stance.OnStanceChange += OnStanceChange;
@@ -134,6 +136,33 @@ namespace CompetentAI.Mod
 
         private bool Active => _loaded && !_disabled && Runtime.Flags.Enabled && creature != null && creature.state == Creature.State.Alive;
 
+        /// <summary>
+        /// Picks the skill profile: the menu's forced level if any, otherwise by creature / faction / brain / difficulty
+        /// plus the menu's shift. Called at load and again whenever the menu changes (live).
+        /// </summary>
+        private void ChooseProfile()
+        {
+            EffectiveFlags f = Runtime.Flags;
+            var ladder = Runtime.Cfg.Assignment.Ladder;
+            string name;
+            if (f.SkillLevel >= 1 && f.SkillLevel <= ladder.Count && Runtime.Cfg.Profiles.ContainsKey(ladder[f.SkillLevel - 1]))
+                name = ladder[f.SkillLevel - 1];
+            else
+            {
+                name = Runtime.Resolver.ResolveName(_creatureId, _brainId, _faction, _instance.difficulty);
+                if (f.LevelShift != 0) name = Runtime.Resolver.Shift(name, f.LevelShift);
+            }
+            _appliedLevel = f.SkillLevel;
+            _appliedShift = f.LevelShift;
+            if (_profile != null && name == _profileName) return;
+
+            _profileName = name;
+            _profile = Runtime.Resolver.Get(name).WithJitter(_noise);
+            _reader = new FeintReader(_profile, Runtime.Cfg.Defense, _rng);
+            _fatigue = new ParryFatigue(_profile);
+            _gate.Reset();
+        }
+
         // ---------------------------------------------------------------- per-frame entry points
 
         public override void Update()
@@ -147,7 +176,12 @@ namespace CompetentAI.Mod
                     _nextSync = now + 0.5f;
                     SyncTuning(false);
                 }
-                if (!Active) return;
+                if (!Active)
+                {
+                    if (_kataActive) EndKata("mod off");
+                    if (_feintFor != null) ClearFeint();
+                    return;
+                }
                 Tick(now);
             }
             catch (Exception ex)
@@ -180,6 +214,7 @@ namespace CompetentAI.Mod
                 return;
             }
             FeintTick(now, target);
+            KataTick(now);
             CounterTick(now, target);
             PlanTick(now, target);
         }
@@ -188,6 +223,7 @@ namespace CompetentAI.Mod
         {
             ClearPlan();
             ClearFeint();
+            EndKata("brain stopped");
             _counterUntil = 0f;
         }
 
@@ -203,12 +239,12 @@ namespace CompetentAI.Mod
 
         private float DistanceTo(Creature target) => _brain.GetHorizontalDistance(target.transform);
 
-        private bool RangeFits(AttackMotion m, float distance)
+        private bool RangeFits(AttackMotion m, float distance, float toleranceOverride = 0f)
         {
             float scale = creature.transform.lossyScale.y;
             float reach = m.includeWeaponReach ? _melee.GetWeaponReach(m.attackSide) : 0f;
             float d = distance - reach;
-            float tol = Mathf.Max(0.15f, _melee.maxRangeDelta);
+            float tol = toleranceOverride > 0f ? toleranceOverride : Mathf.Max(0.15f, _melee.maxRangeDelta);
             float min = m.minRange * scale;
             if (Mathf.Abs(min - d) <= tol) return true;
             return m.sweep && m.maxRange * scale > d && min <= d + tol;
