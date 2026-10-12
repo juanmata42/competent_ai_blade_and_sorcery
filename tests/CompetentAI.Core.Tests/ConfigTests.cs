@@ -131,6 +131,16 @@ namespace CompetentAI.Core.Tests
         }
 
         [Fact]
+        public void Calibration_files_from_an_older_measurement_method_are_discarded()
+        {
+            string old = "{ \"_votes\": { \"X\": { \"Thrust\": 9 } } }";   // no Version field: measured with the flawed method
+            Assert.Equal(0, DirectionCalibration.FromJson(old).Keys);
+            var fresh = new DirectionCalibration();
+            fresh.Add("X", CutDirection.Left);
+            Assert.Equal(1, DirectionCalibration.FromJson(fresh.ToJson()).Keys);
+        }
+
+        [Fact]
         public void Calibration_round_trips_through_json()
         {
             var cal = new DirectionCalibration();
@@ -148,7 +158,7 @@ namespace CompetentAI.Core.Tests
             var cal = new CalibrationConfig();
             var data = new DirectionCalibration();
             var res = new DirectionResolver(rules, cal, data);
-            Assert.Equal(CutDirection.Left, res.Resolve("SwingRightToLeft", "Bas.Animation.Attack.Sword1h.Stance1.RtLSwing", AttackKind.Swing, out string s1));
+            Assert.Equal(CutDirection.Right, res.Resolve("SwingRightToLeft", "Bas.Animation.Attack.Sword1h.Stance1.RtLSwing", AttackKind.Swing, out string s1));
             Assert.Equal("name", s1);
             Assert.Equal(CutDirection.Unknown, res.Resolve("RiposteHighLeft", "x", AttackKind.Swing, out string s2));
             Assert.Equal("unknown", s2);
@@ -164,10 +174,10 @@ namespace CompetentAI.Core.Tests
         public void Name_hints_cover_the_stock_vanilla_motions_unambiguously()
         {
             Assert.Equal(CutDirection.Thrust, DirectionResolver.FromName("LungeThrust", "", AttackKind.Thrust));
-            Assert.Equal(CutDirection.Left, DirectionResolver.FromName("SwingRightToLeftStep", "Bas.Animation.Attack.Sword1h.Stance1.SlashRtLStep", AttackKind.Swing));
-            Assert.Equal(CutDirection.Right, DirectionResolver.FromName("SwingLeftToRight", "", AttackKind.Swing));
-            Assert.Equal(CutDirection.DownLeft, DirectionResolver.FromName("SwingTopToLeft", "", AttackKind.Swing));
-            Assert.Equal(CutDirection.DownRight, DirectionResolver.FromName("LungeSwingTopToRight", "", AttackKind.Swing));
+            Assert.Equal(CutDirection.Right, DirectionResolver.FromName("SwingRightToLeftStep", "Bas.Animation.Attack.Sword1h.Stance1.SlashRtLStep", AttackKind.Swing));
+            Assert.Equal(CutDirection.Left, DirectionResolver.FromName("SwingLeftToRight", "", AttackKind.Swing));
+            Assert.Equal(CutDirection.DownRight, DirectionResolver.FromName("SwingTopToLeft", "", AttackKind.Swing));
+            Assert.Equal(CutDirection.DownLeft, DirectionResolver.FromName("LungeSwingTopToRight", "", AttackKind.Swing));
             Assert.Equal(CutDirection.Unknown, DirectionResolver.FromName("CounterSwingHighRight", "", AttackKind.Swing));
         }
     }

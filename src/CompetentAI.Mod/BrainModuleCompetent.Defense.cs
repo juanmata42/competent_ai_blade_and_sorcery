@@ -65,7 +65,7 @@ namespace CompetentAI.Mod
 
                 Vector3 toDefender = creature.transform.position - info.targetPoint;
                 if (info.parryTarget != null &&
-                    _tracker.Update(now, ToVec(info.targetPointVelocity), ToVec(toDefender), Runtime.Cfg.Defense, out float angle))
+                    _tracker.Update(now, ToVec(info.targetPointVelocity), ToVec(toDefender), info.onHitCourse, Runtime.Cfg.Defense, out float angle))
                 {
                     FeintOutcome outcome = _reader.OnReversal(now);
                     Log.Defense($"{_tag} strike changed direction by {angle:0}° -> {outcome}");

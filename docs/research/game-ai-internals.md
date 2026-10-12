@@ -90,6 +90,9 @@ Hallazgo clave: **la IK de parada con un arma a una mano está desactivada en to
 | `CounterThrust` está marcado como `Swing` en los datos (error de datos): las lanzas (solo `Thrust`) nunca lo reciben, así que solo tienen 2 ataques | Reclasificar por id/dirección en el clon por criatura |
 | Sin fintas ni combos controlados | Módulo propio |
 
+### Hallazgo del primer log real (2026-10-12): armas de punta sin ataques
+El clon de serie de `MeleeStanceData` descarta también los ataques con `difficulty` > `BrainData.difficulty` (`TooDifficult`). **Las estocadas del stance base (`Thrust`, `LungeThrust`, `CounterThrust`) tienen dificultad 3.** Resultado observado en el juego: una lanza (solo `Thrust`) con un Brain de dificultad 2 quedó con `openers(0)=[] chains(0)=[] ripostes(0)=[]` — un NPC con lanza en `HumanEasy/HumanMedium` **no tiene ningún ataque** en el juego de serie. **[C: log del juego]**
+
 ### Queja 3 — Ataques que no corresponden al arma
 | Causa [C] | Ejemplos reales |
 |---|---|

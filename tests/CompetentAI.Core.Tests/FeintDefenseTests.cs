@@ -132,10 +132,10 @@ namespace CompetentAI.Core.Tests
             float now = 0f;
             int hits = 0;
             for (int i = 0; i < 10; i++, now += 0.02f)
-                if (t.Update(now, new Vec3(0f, 0f, 3f), ToDefender, cfg, out _)) hits++;   // coming at the defender
+                if (t.Update(now, new Vec3(0f, 0f, 3f), ToDefender, true, cfg, out _)) hits++;   // coming at the defender
             Assert.Equal(0, hits);
             for (int i = 0; i < 10; i++, now += 0.02f)
-                if (t.Update(now, new Vec3(0f, 0.2f, -3f), ToDefender, cfg, out float a))  // pulls back
+                if (t.Update(now, new Vec3(0f, 0.2f, -3f), ToDefender, true, cfg, out float a))  // pulls back
                 {
                     hits++;
                     Assert.True(a > 150f);
@@ -151,9 +151,9 @@ namespace CompetentAI.Core.Tests
             float now = 0f;
             int hits = 0;
             for (int i = 0; i < 8; i++, now += 0.02f)
-                if (t.Update(now, new Vec3(0f, 0f, -3f), ToDefender, cfg, out _)) hits++;  // wind-up: moving AWAY
+                if (t.Update(now, new Vec3(0f, 0f, -3f), ToDefender, true, cfg, out _)) hits++;  // wind-up: moving AWAY
             for (int i = 0; i < 12; i++, now += 0.02f)
-                if (t.Update(now, new Vec3(0f, 0f, 4f), ToDefender, cfg, out _)) hits++;   // the real strike: towards
+                if (t.Update(now, new Vec3(0f, 0f, 4f), ToDefender, true, cfg, out _)) hits++;   // the real strike: towards
             Assert.Equal(0, hits);
         }
 
@@ -165,9 +165,30 @@ namespace CompetentAI.Core.Tests
             float now = 0f;
             int hits = 0;
             for (int i = 0; i < 8; i++, now += 0.02f)
-                if (t.Update(now, new Vec3(0f, 0f, 3f), ToDefender, cfg, out _)) hits++;
+                if (t.Update(now, new Vec3(0f, 0f, 3f), ToDefender, true, cfg, out _)) hits++;
             for (int i = 0; i < 8; i++, now += 0.02f)
-                if (t.Update(now, new Vec3(3f, 0f, 0f), ToDefender, cfg, out _)) hits++;   // veers sideways (90 degrees)
+                if (t.Update(now, new Vec3(3f, 0f, 0f), ToDefender, true, cfg, out _)) hits++;   // veers sideways (90 degrees)
+            Assert.Equal(1, hits);
+        }
+
+        [Fact]
+        public void StrikeTracker_ignores_weapon_waving_that_was_not_on_a_hit_course()
+        {
+            var t = new StrikeTracker();
+            var cfg = new DefenseConfig();
+            float now = 0f;
+            int hits = 0;
+            for (int i = 0; i < 8; i++, now += 0.02f)
+                if (t.Update(now, new Vec3(0f, 0f, 3f), ToDefender, false, cfg, out _)) hits++;   // approaching but not on course
+            for (int i = 0; i < 8; i++, now += 0.02f)
+                if (t.Update(now, new Vec3(0f, 0.2f, -3f), ToDefender, false, cfg, out _)) hits++;
+            Assert.Equal(0, hits);
+            cfg.RequireHitCourse = false;                                                         // the old behaviour is still available
+            var t2 = new StrikeTracker();
+            for (int i = 0; i < 8; i++, now += 0.02f)
+                if (t2.Update(now, new Vec3(0f, 0f, 3f), ToDefender, false, cfg, out _)) hits++;
+            for (int i = 0; i < 8; i++, now += 0.02f)
+                if (t2.Update(now, new Vec3(0f, 0.2f, -3f), ToDefender, false, cfg, out _)) hits++;
             Assert.Equal(1, hits);
         }
 
@@ -181,12 +202,12 @@ namespace CompetentAI.Core.Tests
             for (int i = 0; i < 60; i++, now += 0.02f)
             {
                 double ang = 1.2 + i * 0.02; // slow arc around the approach direction: far below the reversal angle
-                if (t.Update(now, new Vec3((float)Math.Cos(ang) * 3f, 0f, (float)Math.Sin(ang) * 3f), ToDefender, cfg, out _)) hits++;
+                if (t.Update(now, new Vec3((float)Math.Cos(ang) * 3f, 0f, (float)Math.Sin(ang) * 3f), ToDefender, true, cfg, out _)) hits++;
             }
             Assert.Equal(0, hits);
             var slow = new StrikeTracker();
             for (int i = 0; i < 20; i++, now += 0.02f)
-                Assert.False(slow.Update(now, new Vec3(i % 2 == 0 ? 0.05f : -0.05f, 0f, 0f), ToDefender, cfg, out _));
+                Assert.False(slow.Update(now, new Vec3(i % 2 == 0 ? 0.05f : -0.05f, 0f, 0f), ToDefender, true, cfg, out _));
         }
 
         [Fact]

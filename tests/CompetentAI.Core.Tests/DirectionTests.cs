@@ -44,6 +44,27 @@ namespace CompetentAI.Core.Tests
             Assert.Equal(CutDirection.Left, Directions.Classify(attackerLocal));
         }
 
+        [Theory]
+        [InlineData(0f, 0f, 0.8f, 0f, 0f, 1f, CutDirection.Thrust)]        // tip moves along the blade axis
+        [InlineData(0.05f, 0.1f, 0.7f, 0.1f, 0f, 1f, CutDirection.Thrust)]
+        [InlineData(1.09f, -0.15f, 0.90f, 0f, 0f, 1f, CutDirection.Right)] // measured in game: RightToLeft, arm extends forward too
+        [InlineData(-0.61f, -0.16f, 0.16f, 0f, 0f, 1f, CutDirection.Left)]
+        [InlineData(0.4f, -0.5f, 0.6f, 0f, 0f, 1f, CutDirection.DownRight)]
+        [InlineData(0f, 0.6f, 0.5f, 0f, 0f, 1f, CutDirection.Up)]
+        public void Measured_tip_paths_use_the_blade_axis_for_thrusts_and_the_lateral_part_for_cuts(
+            float mx, float my, float mz, float ax, float ay, float az, CutDirection expected)
+        {
+            Assert.Equal(expected, Directions.ClassifyMeasured(new Vec3(mx, my, mz), new Vec3(ax, ay, az)));
+        }
+
+        [Fact]
+        public void Measured_paths_too_short_or_without_lateral_travel_are_not_classified()
+        {
+            Assert.Equal(CutDirection.Unknown, Directions.ClassifyMeasured(new Vec3(0.05f, 0.02f, 0.05f), new Vec3(0f, 0f, 1f)));
+            // forward-only motion while the blade points sideways: neither a thrust nor a readable cut
+            Assert.Equal(CutDirection.Unknown, Directions.ClassifyMeasured(new Vec3(0.05f, 0.05f, 0.9f), new Vec3(1f, 0f, 0f)));
+        }
+
         [Fact]
         public void Opposite_and_mirror_are_involutions()
         {

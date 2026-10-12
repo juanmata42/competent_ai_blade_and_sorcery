@@ -109,59 +109,101 @@ namespace CompetentAI.Mod
             var lists = new[] { data.openingAttacks, data.chainAttacks, data.ripostes };
             string[] names = { "openers", "chains", "ripostes" };
 
+            // What the stock clone gave this creature, kept so that a creature is never left without any attack.
+            var stockOpeners = new List<MotionInfo>();
+
             for (int li = 0; li < lists.Length; li++)
             {
                 List<AttackMotion> list = lists[li];
                 var keep = new List<AttackMotion>(list.Count);
-                var all = new List<MotionInfo>(list.Count);
-                var removedNotes = new List<string>();
                 foreach (AttackMotion m in list)
                 {
                     MotionInfo mi = MakeInfo(m, rules, dirs, li == 1);
-                    all.Add(mi);
+                    if (li == 0) stockOpeners.Add(mi);
                     RuleVerdict v = applyRules ? rules.Evaluate(right, left, mi.Candidate) : new RuleVerdict();
                     if (v.Allowed)
                     {
                         mi.BaseWeight = m.weight * v.Bias;
+                        m.weight = mi.BaseWeight;
+                        infos[m] = mi;
                         keep.Add(m);
                     }
                     else
                     {
-                        removedNotes.Add(names[li] + ":-" + m.id + " (" + v.Reason + ")");
+                        report.Removed++;
+                        report.Notes.Add(names[li] + ":-" + m.id + " (" + v.Reason + ")");
                     }
-                }
-                if (keep.Count == 0 && list.Count > 0)
-                {
-                    // Never leave a creature without attacks: keep the stock list untouched.
-                    report.Notes.Add(names[li] + ": every attack was filtered, keeping the stock list");
-                    foreach (MotionInfo mi in all)
-                    {
-                        mi.BaseWeight = mi.Motion.weight;
-                        keep.Add(mi.Motion);
-                    }
-                }
-                else
-                {
-                    report.Removed += removedNotes.Count;
-                    report.Notes.AddRange(removedNotes);
-                }
-                var keepSet = new HashSet<AttackMotion>(keep);
-                foreach (MotionInfo mi in all)
-                {
-                    if (!keepSet.Contains(mi.Motion)) continue;
-                    infos[mi.Motion] = mi;
-                    mi.Motion.weight = mi.BaseWeight;
                 }
                 list.Clear();
                 list.AddRange(keep);
             }
 
             if (applyRules && cfg.Rules.ReadmitReclassified) Readmit(data, right, left, rules, dirs, difficulty, infos, report);
+
+            if (applyRules)
+            {
+                // The stock clone also drops every attack harder than the brain's difficulty. For a weapon whose only legitimate
+                // attacks are the hard ones (thrust-only spears, edgeless daggers) that leaves NOTHING: such creatures just stand
+                // there. Give them the legitimate attacks regardless of difficulty, but only when they would have none.
+                if (data.openingAttacks.Count == 0) AdmitIgnoringDifficulty(data, 0, right, left, rules, dirs, infos, report);
+                if (data.chainAttacks.Count == 0) AdmitIgnoringDifficulty(data, 1, right, left, rules, dirs, infos, report);
+            }
+
+            if (data.openingAttacks.Count == 0 && stockOpeners.Count > 0)
+            {
+                // Still nothing (e.g. an unrecognised weapon): never leave a creature without attacks, keep the stock list.
+                report.Notes.Add("openers: nothing legitimate left, keeping the stock list");
+                report.Removed = 0;
+                foreach (MotionInfo mi in stockOpeners)
+                {
+                    mi.BaseWeight = mi.Motion.weight;
+                    data.openingAttacks.Add(mi.Motion);
+                    infos[mi.Motion] = mi;
+                }
+            }
+
             if (applyRules) SynthesizeThrustRiposte(data, rules, dirs, infos, report);
 
             data.UpdateAllNodes(false);
             data.PopulateAllNodeLists();
             return infos;
+        }
+
+        /// <summary>Admits the legitimate attacks of the source stance whatever their difficulty (only called when a list is empty).</summary>
+        private static void AdmitIgnoringDifficulty(MeleeStanceData data, int listIndex, WeaponProfile right, WeaponProfile left,
+            AttackRules rules, DirectionResolver dirs, Dictionary<AttackMotion, MotionInfo> infos, CurationReport report)
+        {
+            MeleeStanceData source = Catalog.GetData<StanceData>(data.id) as MeleeStanceData;
+            if (source == null) return;
+            List<AttackMotion> from = listIndex == 0 ? source.openingAttacks : source.chainAttacks;
+            List<AttackMotion> into = listIndex == 0 ? data.openingAttacks : data.chainAttacks;
+            int added = 0;
+            foreach (AttackMotion src in from)
+            {
+                if (src == null || src.attackMotion == ItemModuleAI.AttackType.None) continue;
+                MotionInfo mi = MakeInfo(src, rules, dirs, listIndex == 1);
+                if (mi.Candidate.Kind == AttackKind.Unknown) continue;
+                bool dataOk = ItemAllowsKind(mi.Candidate.Side == Hand.Left ? left : right, mi.Candidate.Kind) &&
+                              (mi.Candidate.Side != Hand.Both || ItemAllowsKind(left, mi.Candidate.Kind));
+                if (!dataOk) continue;
+                RuleVerdict v = rules.Evaluate(right, left, mi.Candidate);
+                if (!v.Allowed) continue;
+
+                AttackMotion copy = src.Copy<AttackMotion>();
+                mi.Motion = copy;
+                mi.Candidate.Tag = copy;
+                mi.BaseWeight = src.weight * v.Bias;
+                mi.Readmitted = true;
+                copy.weight = mi.BaseWeight;
+                into.Add(copy);
+                infos[copy] = mi;
+                added++;
+            }
+            if (added > 0)
+            {
+                report.Readmitted += added;
+                report.Notes.Add((listIndex == 0 ? "openers" : "chains") + ": +" + added + " legitimate attack(s) the stock filter dropped only for difficulty (the list was empty)");
+            }
         }
 
         private static bool ItemAllowsKind(WeaponProfile w, AttackKind k)

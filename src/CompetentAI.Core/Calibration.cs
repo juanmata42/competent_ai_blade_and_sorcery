@@ -10,6 +10,24 @@ namespace CompetentAI.Core
     /// </summary>
     public sealed class DirectionCalibration
     {
+        /// <summary>Bumped when the measurement method changes: older files are discarded (they would mislead).</summary>
+        public const int CurrentVersion = 2;
+
+        [JsonProperty]
+        public int Version;
+
+        public DirectionCalibration()
+        {
+            Version = CurrentVersion;
+        }
+
+        /// <summary>Used by the JSON reader: a file without a Version field is an OLD file (version 0).</summary>
+        [JsonConstructor]
+        private DirectionCalibration(bool fromJson)
+        {
+            Version = 0;
+        }
+
         [JsonProperty]
         private Dictionary<string, Dictionary<string, int>> _votes =
             new Dictionary<string, Dictionary<string, int>>(StringComparer.OrdinalIgnoreCase);
@@ -82,7 +100,8 @@ namespace CompetentAI.Core
             try
             {
                 if (string.IsNullOrWhiteSpace(json)) return new DirectionCalibration();
-                return JsonConvert.DeserializeObject<DirectionCalibration>(json) ?? new DirectionCalibration();
+                var loaded = JsonConvert.DeserializeObject<DirectionCalibration>(json);
+                return loaded != null && loaded.Version == CurrentVersion ? loaded : new DirectionCalibration();
             }
             catch
             {
@@ -93,8 +112,8 @@ namespace CompetentAI.Core
 
     /// <summary>
     /// Resolves the direction of an attack by (in order): explicit config override, runtime measurement,
-    /// unambiguous name hints, otherwise Unknown. Name hints are INFERRED from the stock ids and were not
-    /// verified against the animation clips; measurements supersede them.
+    /// unambiguous name hints, otherwise Unknown. Name hints are INFERRED from the stock ids (confirmed for two of them by
+    /// the first in-game measurements); measurements supersede them.
     /// </summary>
     public sealed class DirectionResolver
     {
@@ -143,10 +162,13 @@ namespace CompetentAI.Core
             string l = t.ToLowerInvariant();
             if (kind == AttackKind.Thrust || l.Contains("thrust") || l.Contains("stab")) return CutDirection.Thrust;
             if (kind == AttackKind.Bash) return CutDirection.Unknown;
-            if (t.Contains("RtL") || l.Contains("righttoleft")) return CutDirection.Left;
-            if (t.Contains("LtR") || l.Contains("lefttoright")) return CutDirection.Right;
-            if (t.Contains("TtL") || l.Contains("toptoleft")) return CutDirection.DownLeft;
-            if (t.Contains("TtR") || l.Contains("toptoright")) return CutDirection.DownRight;
+            // The stock names are written from the DEFENDER's point of view: "RightToLeft" starts on the defender's right and ends
+            // on the defender's left, i.e. it travels towards the ATTACKER's right. Observed in game on 2026-10-12 (RtL measured
+            // 'Right', LtR measured 'Left'); the top-diagonals are the same rule applied, still to be confirmed by measurement.
+            if (t.Contains("RtL") || l.Contains("righttoleft")) return CutDirection.Right;
+            if (t.Contains("LtR") || l.Contains("lefttoright")) return CutDirection.Left;
+            if (t.Contains("TtL") || l.Contains("toptoleft")) return CutDirection.DownRight;
+            if (t.Contains("TtR") || l.Contains("toptoright")) return CutDirection.DownLeft;
             return CutDirection.Unknown;
         }
     }

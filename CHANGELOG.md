@@ -2,6 +2,18 @@
 
 Formato basado en *Keep a Changelog*. Versionado semántico (`ModVersion` del manifest).
 
+## [0.4.0] — 2026-10-12 (primera versión con datos reales del juego)
+
+### Retirado
+- **Hechizos de práctica** (`Spar: weapons`, `Spar: parry dummy`), sus contenedores, el modo demostrador, los roles y la sección `Sparring` de la configuración: en la primera prueba funcionaban mal. El código sigue en la etiqueta de git `sparring-v0.3.1` por si se quiere retomar de otra forma.
+
+### Corregido a partir del primer `Player.log` real
+- **NPCs con arma de punta sin ningún ataque** (lanza en cerebros de dificultad 1–2; daga sin filo): ver DESIGN §4a.7. Ahora se rescatan los ataques legítimos ignorando la dificultad cuando la lista quedaría vacía. Además la red de seguridad "conservar la lista de serie" ya no devuelve cortes a un arma sin filo.
+- **Medición de direcciones**: casi todos los cortes se medían como estocada (el avance del brazo dominaba). Ahora la estocada se decide por el eje de la hoja y el corte por su parte lateral. Los ficheros `calibration.json` anteriores se descartan.
+- **Etiquetas por nombre**: `RightToLeft/LeftToRight/TopToLeft/TopToRight` están escritos desde el punto de vista del defensor (medido: `RtL` viaja hacia la derecha del atacante); invertidas.
+- **Detector de fintas** demasiado sensible (varios avisos por segundo con solo mover la espada): ahora exige que el golpe viniera en curso de impacto (`Defense.RequireHitCourse`).
+- **Limitador de log**: las líneas Info/Warn/Error ya no se descartan (53 líneas de arranque se perdieron en una ráfaga de apariciones).
+
 ## [0.3.1] — 2026-10-12 (sin probar en el juego)
 
 ### Cambiado

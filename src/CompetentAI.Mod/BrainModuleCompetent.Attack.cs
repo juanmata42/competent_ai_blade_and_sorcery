@@ -41,6 +41,7 @@ namespace CompetentAI.Mod
         private bool _advTracking;
         private Collider _calCollider;
         private Vector3 _calStart;
+        private Vector3 _calAxis;
         private bool _calHasStart;
 
         // ---------------------------------------------------------------- stance clone curation
@@ -52,7 +53,7 @@ namespace CompetentAI.Mod
             {
                 MeleeStanceData md = data as MeleeStanceData;
                 if (md == null || md == _curatedData) return;
-                if (!Runtime.Flags.Enabled && _role == SparringRole.None) return;
+                if (!Runtime.Flags.Enabled) return;
 
                 _wRight = WeaponInspector.Build(HeldOrChosen(Side.Right), Runtime.Cfg.Rules);
                 _wLeft = WeaponInspector.Build(HeldOrChosen(Side.Left), Runtime.Cfg.Rules);
@@ -172,24 +173,17 @@ namespace CompetentAI.Mod
 
         public void OnAttackStage(BrainModuleAttack.AttackStage stage, Creature targetCreature, Transform targetTransform)
         {
-            if (!_loaded || _disabled || (!Runtime.Flags.Enabled && !IsDemo)) return;
+            if (!_loaded || _disabled || !Runtime.Flags.Enabled) return;
             try
             {
                 AttackMotion atk = _melee.attack ?? _melee.lastAttack;
                 switch (stage)
                 {
-                    case BrainModuleAttack.AttackStage.WindUp:
-                        if (IsDemo)
-                        {
-                            _advStart = creature.transform.position; // demos still measure body advance
-                            _advTracking = true;
-                        }
-                        else OnWindUp(atk, targetCreature);
-                        break;
+                    case BrainModuleAttack.AttackStage.WindUp: OnWindUp(atk, targetCreature); break;
                     case BrainModuleAttack.AttackStage.Attack: CalibrationBegin(atk); break;
                     case BrainModuleAttack.AttackStage.FollowThrough: CalibrationEnd(atk); break;
                     case BrainModuleAttack.AttackStage.End:
-                        if (!_suppressEnd && !IsDemo) OnAttackEnd(atk, targetCreature);
+                        if (!_suppressEnd) OnAttackEnd(atk, targetCreature);
                         break;
                     case BrainModuleAttack.AttackStage.Cancel:
                         _calHasStart = false;
@@ -405,6 +399,12 @@ namespace CompetentAI.Mod
             Log.Debug_($"{_tag} measured {atk.id}: {(advanced ? "advances" : "stays")} ({forward:0.00} m forward)");
         }
 
+        private Vector3 BladeBaseLocal(AttackMotion atk)
+        {
+            RagdollHand hand = atk.attackSide == Interactable.HandSide.Left ? creature.handLeft : creature.handRight;
+            return hand != null ? creature.transform.InverseTransformPoint(hand.transform.position) : Vector3.zero;
+        }
+
         private void CalibrationBegin(AttackMotion atk)
         {
             _calHasStart = false;
@@ -413,6 +413,7 @@ namespace CompetentAI.Mod
             {
                 _calCollider = c;
                 _calStart = p;
+                _calAxis = p - BladeBaseLocal(atk); // where the blade points: grip -> tip
                 _calHasStart = true;
             }
         }
@@ -426,13 +427,13 @@ namespace CompetentAI.Mod
             MeasureAdvance(atk);
             if (motion.magnitude < Directions.MinMeasurableTravel) return;
 
-            CutDirection d = Directions.Classify(new Vec3(motion.x, motion.y, motion.z));
+            CutDirection d = Directions.ClassifyMeasured(new Vec3(motion.x, motion.y, motion.z), new Vec3(_calAxis.x, _calAxis.y, _calAxis.z));
             if (d == CutDirection.Unknown) return;
             Runtime.Calibration.Add(atk.address, d);
             Runtime.Calibration.Add(atk.id, d);
             Runtime.CalibrationDirty = true;
             Runtime.CalibrationRevision++;
-            Log.Debug_($"{_tag} measured {atk.id}: {d} (travel {motion.magnitude:0.00} m, local ({motion.x:0.00},{motion.y:0.00},{motion.z:0.00}))");
+            Log.Debug_($"{_tag} measured {atk.id}: {d} (travel {motion.magnitude:0.00} m, local ({motion.x:0.00},{motion.y:0.00},{motion.z:0.00}), blade ({_calAxis.x:0.00},{_calAxis.y:0.00},{_calAxis.z:0.00}))");
         }
     }
 }

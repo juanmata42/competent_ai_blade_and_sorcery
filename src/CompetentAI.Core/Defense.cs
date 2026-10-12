@@ -14,6 +14,8 @@ namespace CompetentAI.Core
             public Vec3 Dir;
             /// <summary>Cosine between the motion and the direction towards the defender (positive = approaching).</summary>
             public float Approach;
+            /// <summary>The game judged the strike to be on course to hit the defender.</summary>
+            public bool OnCourse;
         }
 
         private const int Capacity = 32;
@@ -34,7 +36,7 @@ namespace CompetentAI.Core
         /// point to the defender: only a motion that was APPROACHING the defender and then changes direction counts
         /// as a feint. A back-swing followed by the real strike (away, then towards) is a normal attack, not a feint.
         /// </summary>
-        public bool Update(float now, Vec3 velocity, Vec3 towardDefender, DefenseConfig cfg, out float angle)
+        public bool Update(float now, Vec3 velocity, Vec3 towardDefender, bool onHitCourse, DefenseConfig cfg, out float angle)
         {
             angle = 0f;
             if (velocity.Magnitude < cfg.MinStrikeSpeed) return false;
@@ -48,7 +50,7 @@ namespace CompetentAI.Core
             {
                 Sample oldest = Get(_count - 1);
                 float a = Vec3.Angle(oldest.Dir, dir);
-                if (a >= cfg.ReversalAngle && oldest.Approach > 0.2f)
+                if (a >= cfg.ReversalAngle && oldest.Approach > 0.2f && (oldest.OnCourse || !cfg.RequireHitCourse))
                 {
                     reversed = true;
                     angle = a;
@@ -59,7 +61,7 @@ namespace CompetentAI.Core
 
             _head = (_head + 1) % Capacity;
             Vec3 toward = towardDefender.Normalized;
-            _samples[_head] = new Sample { Time = now, Dir = dir, Approach = toward.SqrMagnitude < 0.5f ? 1f : Vec3.Dot(dir, toward) };
+            _samples[_head] = new Sample { Time = now, Dir = dir, OnCourse = onHitCourse, Approach = toward.SqrMagnitude < 0.5f ? 1f : Vec3.Dot(dir, toward) };
             if (_count < Capacity) _count++;
             return reversed;
         }

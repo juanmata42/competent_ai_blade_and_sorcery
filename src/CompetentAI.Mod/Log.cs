@@ -26,12 +26,12 @@ namespace CompetentAI.Mod
 
         public static void Warn(string msg)
         {
-            if (Level >= LogLevel.Warn && Allow(false)) Debug.LogWarning(Prefix + msg);
+            if (Level >= LogLevel.Warn && Allow(true)) Debug.LogWarning(Prefix + msg);
         }
 
         public static void Info(string msg)
         {
-            if (Level >= LogLevel.Info && Allow(false)) Debug.Log(Prefix + msg);
+            if (Level >= LogLevel.Info && Allow(true)) Debug.Log(Prefix + msg);
         }
 
         public static void Debug_(string msg)
@@ -54,7 +54,7 @@ namespace CompetentAI.Mod
             if (DefenseLogs && Level >= LogLevel.Debug && Allow(false)) Debug.Log(Prefix + "[def] " + msg);
         }
 
-        /// <summary>Errors always get through (they are the most useful lines), everything else is rate limited.</summary>
+        /// <summary>Error, Warn and Info lines always get through (a burst of spawns must not hide them); Debug/Trace/attack/defence lines are rate limited.</summary>
         private static bool Allow(bool force)
         {
             float now = Time.realtimeSinceStartup;

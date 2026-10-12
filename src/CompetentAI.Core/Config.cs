@@ -148,6 +148,9 @@ namespace CompetentAI.Core
         public float ReversalAngle = 75f;
         /// <summary>Time window (seconds) in which the direction change is measured.</summary>
         public float ReversalWindow = 0.35f;
+        /// <summary>Only a strike that was on course to hit counts as a feint when it changes direction (ignores plain weapon waving).</summary>
+        public bool RequireHitCourse = true;
+
         /// <summary>Strike speed (m/s) below which direction changes are ignored.</summary>
         public float MinStrikeSpeed = 1.2f;
         /// <summary>When fooled, the guard is slowed by this factor (0 = frozen).</summary>
@@ -195,7 +198,6 @@ namespace CompetentAI.Core
         public VarietyConfig Variety = new VarietyConfig();
         public FeintConfig Feints = new FeintConfig();
         public KataConfig Katas = new KataConfig();
-        public SparringConfig Sparring = new SparringConfig();
         public DefenseConfig Defense = new DefenseConfig();
         public CalibrationConfig Calibration = new CalibrationConfig();
         public LoggingConfig Logging = new LoggingConfig();
@@ -209,8 +211,6 @@ namespace CompetentAI.Core
             Variety = Variety ?? new VarietyConfig();
             Feints = Feints ?? new FeintConfig();
             Katas = Katas ?? new KataConfig();
-            Sparring = Sparring ?? new SparringConfig();
-            Sparring.Normalize();
             Defense = Defense ?? new DefenseConfig();
             Calibration = Calibration ?? new CalibrationConfig();
             Logging = Logging ?? new LoggingConfig();

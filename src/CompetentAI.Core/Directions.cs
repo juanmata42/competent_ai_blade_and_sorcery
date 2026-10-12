@@ -59,6 +59,23 @@ namespace CompetentAI.Core
         }
 
         /// <summary>
+        /// Classifies a MEASURED weapon-tip path (attacker local frame) knowing where the blade points. A strike is a thrust
+        /// only when the tip travels along the blade axis (forwards); otherwise the direction is taken from the lateral part
+        /// of the motion (x, y) alone, because the arm extending towards the target adds a large forward component to every
+        /// swing. Returns Unknown when there is not enough lateral travel to tell.
+        /// </summary>
+        public static CutDirection ClassifyMeasured(Vec3 tipMotionLocal, Vec3 bladeAxisLocal, float thrustAlongAxis = 0.8f, float minLateral = 0.2f)
+        {
+            float len = tipMotionLocal.Magnitude;
+            if (len < MinMeasurableTravel) return CutDirection.Unknown;
+            Vec3 axis = bladeAxisLocal.Normalized;
+            if (axis.SqrMagnitude > 0.5f && Vec3.Dot(tipMotionLocal, axis) / len >= thrustAlongAxis) return CutDirection.Thrust;
+            float lateral = (float)Math.Sqrt(tipMotionLocal.X * tipMotionLocal.X + tipMotionLocal.Y * tipMotionLocal.Y);
+            if (lateral < minLateral) return CutDirection.Unknown;
+            return Classify(new Vec3(tipMotionLocal.X, tipMotionLocal.Y, 0f));
+        }
+
+        /// <summary>
         /// Converts a world-space strike velocity seen from the DEFENDER (given in the defender's local frame)
         /// into the attacker's local frame, so incoming strikes and own attacks use the same labels.
         /// The attacker faces the defender, so x and z are mirrored.

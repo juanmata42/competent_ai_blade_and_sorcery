@@ -128,6 +128,21 @@ namespace CompetentAI.Core.Tests
         }
 
         [Fact]
+        public void Stock_difficulty_filter_leaves_thrust_only_weapons_with_nothing_on_easy_and_medium_brains()
+        {
+            // Evidence from the game log (2026-10-12): a spear on a difficulty-2 brain ended up with openers(0). The stock filter
+            // drops attacks harder than the brain's difficulty and every thrust of the stock stance has difficulty 3.
+            string path = FindStance("HumanMelee1hStance");
+            if (path == null) return;
+            JObject o = JObject.Parse(File.ReadAllText(path));
+            var thrusts = ((JArray)o["openingAttacks"]).Where(m => (string)m["attackMotion"] == "Thrust").ToList();
+            Assert.NotEmpty(thrusts);
+            Assert.All(thrusts, m => Assert.True((int)m["difficulty"] >= 3));
+            var swings = ((JArray)o["openingAttacks"]).Where(m => (string)m["attackMotion"] == "Swing").ToList();
+            Assert.NotEmpty(swings);
+        }
+
+        [Fact]
         public void Common_sword_keeps_everything_the_game_gives_it()
         {
             foreach (string list in new[] { "openingAttacks", "chainAttacks", "ripostes" })
@@ -165,10 +180,10 @@ namespace CompetentAI.Core.Tests
             var res = new DirectionResolver(new RulesConfig(), new CalibrationConfig(), new DirectionCalibration());
             var labelled = openers.ToDictionary(m => m.Id, m =>
                 res.Resolve(m.Id, m.Address, rules.ResolveKind(m.Id, m.Address, m.Declared == "Thrust" ? AttackKind.Thrust : AttackKind.Swing), out _));
-            Assert.Equal(CutDirection.Left, labelled["SwingRightToLeft"]);
-            Assert.Equal(CutDirection.Right, labelled["SwingLeftToRight"]);
-            Assert.Equal(CutDirection.DownLeft, labelled["SwingTopToLeft"]);
-            Assert.Equal(CutDirection.DownRight, labelled["SwingTopToRight"]);
+            Assert.Equal(CutDirection.Right, labelled["SwingRightToLeft"]);
+            Assert.Equal(CutDirection.Left, labelled["SwingLeftToRight"]);
+            Assert.Equal(CutDirection.DownRight, labelled["SwingTopToLeft"]);
+            Assert.Equal(CutDirection.DownLeft, labelled["SwingTopToRight"]);
             Assert.Equal(CutDirection.Thrust, labelled["Thrust"]);
             Assert.Equal(CutDirection.Thrust, labelled["LungeThrust"]);
         }

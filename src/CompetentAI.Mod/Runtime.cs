@@ -35,17 +35,6 @@ namespace CompetentAI.Mod
         public static bool CalibrationDirty;
         /// <summary>Incremented whenever a new direction measurement arrives, so cached labels can be refreshed lazily.</summary>
         public static int CalibrationRevision;
-        /// <summary>Practice NPCs summoned by the sparring spells.</summary>
-        public static readonly Dictionary<Creature, SparringRole> Roles = new Dictionary<Creature, SparringRole>();
-
-        /// <summary>Text shown for each practice NPC in demonstration labels (weapon name).</summary>
-        public static readonly Dictionary<Creature, string> Labels = new Dictionary<Creature, string>();
-
-        public static SparringRole RoleOf(Creature c)
-        {
-            return c != null && Roles.TryGetValue(c, out SparringRole r) ? r : SparringRole.None;
-        }
-
         public static readonly Dictionary<Creature, BrainModuleCompetent> Modules = new Dictionary<Creature, BrainModuleCompetent>();
 
         public static string ConfigPath => Path.Combine(ModFolder, "CompetentAI.config.json");
@@ -136,10 +125,6 @@ namespace CompetentAI.Mod
                 if (kv.Key == null) (dead ?? (dead = new List<Creature>())).Add(kv.Key);
             if (dead != null) foreach (Creature c in dead) Modules.Remove(c);
 
-            List<Creature> deadRoles = null;
-            foreach (var kv in Roles)
-                if (kv.Key == null) (deadRoles ?? (deadRoles = new List<Creature>())).Add(kv.Key);
-            if (deadRoles != null) foreach (Creature c in deadRoles) { Roles.Remove(c); Labels.Remove(c); }
         }
 
         public static void Register(Creature c, BrainModuleCompetent m) => Modules[c] = m;

@@ -72,6 +72,7 @@
 |---|---|---|---|
 | `Defense.ReversalAngle` | 75 | 30 … 150 | A change of strike direction larger than this (degrees) within ReversalWindow counts as a feint. |
 | `Defense.ReversalWindow` | 0.35 | 0.1 … 1.5 | Time window (seconds) in which the direction change is measured. |
+| `Defense.RequireHitCourse` | true | true/false | Only a strike that was on course to hit counts as a feint when it changes direction (ignores plain weapon waving). |
 | `Defense.MinStrikeSpeed` | 1.2 | 0.3 … 10 | Strike speed (m/s) below which direction changes are ignored. |
 | `Defense.FooledSpeedFactor` | 0.12 | 0 … 1 | When fooled, the guard is slowed by this factor (0 = frozen). |
 | `Defense.ReadSpeedFactor` | 1.6 | 1 … 3 | When a feint is read, the guard follows this much faster for a moment. |
