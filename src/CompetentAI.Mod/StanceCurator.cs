@@ -15,6 +15,7 @@ namespace CompetentAI.Mod
         public string DirectionSource = "";
         public bool Synthesized;
         public bool Readmitted;
+        public int DirectionRevision = -1;
     }
 
     internal sealed class CurationReport
@@ -74,12 +75,14 @@ namespace CompetentAI.Mod
             };
             c.IsLunge = kind != AttackKind.Bash && rules.LooksLikeLunge(m.id, m.minRange);
             c.Direction = dirs.Resolve(m.id, m.address, kind, out string src);
-            return new MotionInfo { Motion = m, Candidate = c, BaseWeight = m.weight, DirectionSource = src };
+            return new MotionInfo { Motion = m, Candidate = c, BaseWeight = m.weight, DirectionSource = src, DirectionRevision = Runtime.CalibrationRevision };
         }
 
         /// <summary>Re-resolves the direction (e.g. after new measurements arrived).</summary>
         public static void RefreshDirection(MotionInfo mi, DirectionResolver dirs)
         {
+            if (mi.DirectionRevision == Runtime.CalibrationRevision) return; // nothing new measured since last resolve
+            mi.DirectionRevision = Runtime.CalibrationRevision;
             mi.Candidate.Direction = dirs.Resolve(mi.Candidate.Id, mi.Candidate.Address, mi.Candidate.Kind, out string src);
             mi.DirectionSource = src;
         }

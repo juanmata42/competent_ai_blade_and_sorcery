@@ -31,6 +31,8 @@ namespace CompetentAI.Mod
         public static EffectiveFlags Flags = new EffectiveFlags();
         public static string ModFolder = "";
         public static bool CalibrationDirty;
+        /// <summary>Incremented whenever a new direction measurement arrives, so cached labels can be refreshed lazily.</summary>
+        public static int CalibrationRevision;
         public static readonly Dictionary<Creature, BrainModuleCompetent> Modules = new Dictionary<Creature, BrainModuleCompetent>();
 
         public static string ConfigPath => Path.Combine(ModFolder, "CompetentAI.config.json");

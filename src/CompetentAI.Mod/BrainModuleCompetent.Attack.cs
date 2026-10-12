@@ -18,6 +18,7 @@ namespace CompetentAI.Mod
         // variety plan
         private AttackMotion _planned;
         private float _planTime;
+        private float _nextPlanAttempt;
         private float _lastPoseSwitch;
         private readonly List<AttackCandidate> _candScratch = new List<AttackCandidate>(24);
         private float[] _weightScratch = new float[24];
@@ -100,7 +101,9 @@ namespace CompetentAI.Mod
         {
             if (!Runtime.Flags.Variety || _curatedData == null || _profile.VarietyStrength <= 0f) return;
             if (_brain.isAttacking || _brain.isDodging) return;
+            if (now < _nextPlanAttempt) return;
             if (_planned != null && now - _planTime < 2.5f) return;
+            _nextPlanAttempt = now + 0.4f; // never re-plan every frame (e.g. while the target is out of range)
             PlanNext(now, target);
         }
 
@@ -400,6 +403,7 @@ namespace CompetentAI.Mod
             Runtime.Calibration.Add(atk.address, d);
             Runtime.Calibration.Add(atk.id, d);
             Runtime.CalibrationDirty = true;
+            Runtime.CalibrationRevision++;
             Log.Debug_($"{_tag} measured {atk.id}: {d} (travel {motion.magnitude:0.00} m, local ({motion.x:0.00},{motion.y:0.00},{motion.z:0.00}))");
         }
     }
