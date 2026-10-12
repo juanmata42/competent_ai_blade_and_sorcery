@@ -1,0 +1,7 @@
+{
+  "Name": "Competent AI",
+  "Description": "NPCs that defend, feint and counter in all nine attack angles, and only attack with what their weapon can really do. Configurable archetypes (Recruit, Soldier, Veteran, Duelist).",
+  "Author": "juanm",
+  "ModVersion": "0.1.0",
+  "GameVersion": "1.0.0.0"
+}

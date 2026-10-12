@@ -1,0 +1,55 @@
+{
+  // COMPETENT AI - configuration. Comments (// and /* */) are allowed.
+  // Every key is optional: anything you leave out keeps its default. Full reference: docs/CONFIG.md.
+  // After the game starts, "CompetentAI.config.effective.json" shows every value actually in force.
+  // The in-game menu (Mods > Competent AI) can only turn modules OFF on top of what this file allows.
+  "ConfigVersion": 1,
+
+  "Modules": {
+    "Enabled": true,            // master switch: false = the mod does nothing
+    "ProfileTuning": true,      // archetype tuning of reaction speed, riposte chance, attack tempo
+    "WeaponRules": true,        // no cuts with edgeless weapons, no thrusts with blunt ones, spears get all their thrusts
+    "Variety": true,            // attack memory + stance steering (ends the A-B-A-B pattern)
+    "Feints": true,             // NPCs start an attack, abort it and redirect
+    "Combos": true,             // NPCs chain a second attack after the first
+    "DefenseReading": true,     // NPCs can fall for your feints / get overwhelmed by sustained parrying
+    "CounterAfterDodge": true,  // NPCs counter-attack right after a dodge
+    "OneHandIK": true,          // EXPERIMENTAL: Veteran/Duelist place their weapon in your strike's path
+    "SideDodge": true,          // EXPERIMENTAL: Duelists may sidestep (needs the game's side-dodge animations)
+    "Calibration": true,        // measure the real direction of each attack animation (calibration.json)
+    "ForceRunOnApiMismatch": false
+  },
+
+  "Assignment": {
+    "DefaultProfile": "Soldier",
+    "GlobalLevelShift": 0,      // -3..+3: moves every NPC along Recruit > Soldier > Veteran > Duelist
+    "ApplyToAllies": true,
+    // Stock brains are already mapped (HumanEasy=Recruit, HumanMedium=Soldier, HumanHard/HardHeavy=Veteran, HumanVIP=Duelist).
+    // Add your own entries here; they merge with the stock ones. Precedence: creature id > faction id > brain id > difficulty.
+    "ByBrainId": {},
+    "ByFactionId": {},
+    "ByCreatureId": {}
+  },
+
+  "Logging": {
+    "Level": "Info",            // Off, Error, Warn, Info, Debug, Trace  (use Debug when reporting a problem)
+    "LogAttacks": true,
+    "LogDefense": true,
+    "MaxLinesPerSecond": 30
+  }
+
+  // Examples (uncomment to use):
+  //
+  // Make Veterans feint more and read feints better, leaving every other field of the profile untouched:
+  // "Profiles": { "Veteran": { "FeintChance": 0.3, "FeintReadSkill": 0.85 } },
+  //
+  // A custom archetype based on Duelist:
+  // "Profiles": { "Boss": { "Extends": "Duelist", "FeintChance": 0.45, "MaxParriesBeforeFatigue": 9 } },
+  // "Assignment": { "ByCreatureId": { "MyBossCreature": "Boss" } },
+  //
+  // Tell the mod what a modded weapon can do, when it cannot read it from the weapon itself:
+  // "Rules": { "TraitOverrides": { "MyModdedKatana": "Edge,Point" }, "ClassOverrides": { "MyModdedKatana": "Sword" } },
+  //
+  // Force the direction of an attack animation from another mod's animation pack:
+  // "Rules": { "DirectionOverrides": { "MyPack.OverheadChop": "Down" } }
+}

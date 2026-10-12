@@ -40,6 +40,8 @@ namespace CompetentAI.Core
         public bool SideDodge = true;
         /// <summary>Measure the real direction of every attack animation at runtime.</summary>
         public bool Calibration = true;
+        /// <summary>Keep running even if the startup API self-check finds members that moved (not recommended).</summary>
+        public bool ForceRunOnApiMismatch = false;
     }
 
     public sealed class AssignmentConfig
