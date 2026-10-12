@@ -2,6 +2,11 @@
 
 Formato basado en *Keep a Changelog*. Versionado semántico (`ModVersion` del manifest).
 
+## [0.4.2] — 2026-10-12
+
+### Añadido
+- **Opción de menú «Extra info (on-screen text)»**, desactivada por defecto: muestra en el panel de texto junto a la mano izquierda lo que hacen los NPCs cercanos (`[Veteran] sequence of 4 strikes: …`, `strike 2: …`, `feint: A > B`, `fell for your feint` / `read your feint`, `overwhelmed`, `counter-attack after dodging`, `breaks off the sequence to defend`). Sección de configuración `Hud` (`Enabled`, `MaxDistance` 10 m, `MinSecondsBetween` 0,8 s, `DismissSeconds` 2 s). Sin esta opción el mod **no muestra ningún texto** (los textos que viste en la v0.3.1 eran las etiquetas de los demostradores, ya retirados).
+
 ## [0.4.1] — 2026-10-12
 
 ### Cambiado (a raíz de «hacen uno, se resetea la animación y hacen otro»)

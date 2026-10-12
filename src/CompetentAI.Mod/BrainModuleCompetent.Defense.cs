@@ -34,6 +34,7 @@ namespace CompetentAI.Mod
                 {
                     _fatigueApplied = true;
                     Log.Defense($"{_tag} overwhelmed: parry disabled for a moment");
+                    Hud.Show(creature, $"[{_profileName}] overwhelmed: cannot parry for a moment");
                 }
                 _defense.parryEnabled = false;
             }
@@ -69,6 +70,9 @@ namespace CompetentAI.Mod
                 {
                     FeintOutcome outcome = _reader.OnReversal(now);
                     Log.Defense($"{_tag} strike changed direction by {angle:0}° -> {outcome}");
+                    Hud.Show(creature, outcome == FeintOutcome.Fooled
+                        ? $"[{_profileName}] fell for your feint"
+                        : $"[{_profileName}] read your feint");
                     if (outcome == FeintOutcome.Fooled && _reader.RollFooledDodge() && now >= _defense.nextAllowedDodgeTime && _defense.canDodge)
                     {
                         Log.Defense($"{_tag} fooled: commits to a dodge");

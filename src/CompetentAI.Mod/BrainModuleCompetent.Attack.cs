@@ -302,6 +302,7 @@ namespace CompetentAI.Mod
 
             EndKata("feint");
             Log.Attack($"{_tag} FEINT {first.id} -> {redirect.id}");
+            Hud.Show(creature, $"[{_profileName}] feint: {first.id} > {redirect.id}");
             _feintsInRow++;
             _pendingDouble = dbl; // read by OnWindUp of the redirected attack, which starts synchronously below
             ChainInto(first, redirect, target.transform, false, true); // cross-fades into the redirect instead of resetting
@@ -415,6 +416,7 @@ namespace CompetentAI.Mod
             if (_detection.allyAttackingCount >= _melee.meleeMax) return; // respect the group's attacker limit
             if (_rng.Value() >= _profile.CounterAfterDodgeChance) return;
             Log.Defense($"{_tag} counter-attack after dodge");
+            Hud.Show(creature, $"[{_profileName}] counter-attack after dodging");
             _melee.AttackTarget(target.transform);
         }
 

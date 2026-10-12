@@ -175,6 +175,22 @@ namespace CompetentAI.Core
         public string File = "calibration.json";
     }
 
+    /// <summary>On-screen info panel ("Extra info" option of the in-game menu, off by default).</summary>
+    public sealed class HudConfig
+    {
+        /// <summary>false = the option can never be turned on from the menu.</summary>
+        public bool Enabled = true;
+
+        /// <summary>Only creatures closer than this (metres) to the player produce messages.</summary>
+        public float MaxDistance = 10f;
+
+        /// <summary>Minimum seconds between two messages (the panel shows one at a time).</summary>
+        public float MinSecondsBetween = 0.8f;
+
+        /// <summary>How long each message stays on screen.</summary>
+        public float DismissSeconds = 2f;
+    }
+
     public sealed class LoggingConfig
     {
         [JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
@@ -200,6 +216,7 @@ namespace CompetentAI.Core
         public KataConfig Katas = new KataConfig();
         public DefenseConfig Defense = new DefenseConfig();
         public CalibrationConfig Calibration = new CalibrationConfig();
+        public HudConfig Hud = new HudConfig();
         public LoggingConfig Logging = new LoggingConfig();
 
         /// <summary>Fills missing pieces and clamps every value into a safe range.</summary>
@@ -214,6 +231,10 @@ namespace CompetentAI.Core
             Defense = Defense ?? new DefenseConfig();
             Calibration = Calibration ?? new CalibrationConfig();
             Logging = Logging ?? new LoggingConfig();
+            Hud = Hud ?? new HudConfig();
+            Hud.MaxDistance = Clamp(Hud.MaxDistance, 1f, 40f);
+            Hud.MinSecondsBetween = Clamp(Hud.MinSecondsBetween, 0.2f, 10f);
+            Hud.DismissSeconds = Clamp(Hud.DismissSeconds, 0.5f, 10f);
 
             var defaults = SkillProfile.CreateDefaults();
             if (Profiles == null) Profiles = new Dictionary<string, SkillProfile>(StringComparer.OrdinalIgnoreCase);

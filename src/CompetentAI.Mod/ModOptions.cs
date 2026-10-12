@@ -92,6 +92,11 @@ namespace CompetentAI.Mod
 
         [ModOptionCategory(Cat, 1)]
         [ModOptionOrder(14)]
+        [ModOption("Extra info (on-screen text)", "Shows a text panel by your left hand with what nearby NPCs are doing: sequences, feints, reading/falling for your feints, counters. Off by default.")]
+        public static bool ExtraInfo = false;
+
+        [ModOptionCategory(Cat, 1)]
+        [ModOptionOrder(15)]
         [ModOptionIntValues(0, 5, 1)]
         [ModOption("Log level", "0 Off, 1 Error, 2 Warn, 3 Info, 4 Debug, 5 Trace. Use 4 when reporting problems.")]
         public static int LogLevelOption = 3;

@@ -15,21 +15,22 @@ Busca en `Player.log` tras llegar al menú principal:
 | Línea esperada | Significado |
 |---|---|
 | `[CompetentAI] API self-check OK (N members)` | Todas las piezas del juego que usa el mod existen |
-| `[CompetentAI] v0.4.1 loaded from '…\Mods\CompetentAI' (config found)` | El `ThunderScript` se instanció |
+| `[CompetentAI] v0.4.2 loaded from '…\Mods\CompetentAI' (config found)` | El `ThunderScript` se instanció |
 | `[CompetentAI] effective settings: enabled=True …` | Flags en vigor |
 | *(sin)* `[ModManager] … Incompatible with game version` ni errores `[ModManager][...][CompetentAI]` | Manifest correcto |
 
 Si el autochequeo dice `FAILED … missing X`: copia esa línea completa; el mod se auto-desactiva (el juego queda como de serie).
-En el menú de opciones debe aparecer la sección **Competent AI** (Mods) con 14 opciones.
+En el menú de opciones debe aparecer la sección **Competent AI** (Mods) con 15 opciones.
 
 ## 1b. Menú en el juego (3 min) — *imprescindible*
-Opciones → Mods → **Competent AI**. Debe verse (en este orden): *Competent AI*, *Skill level*, *Skill shift*, *Chained strikes (katas)*, *Feints*, *Falling for feints / fatigue*, *Counter after dodge*, *Attack variety*, *Weapon rules*, *Skill tuning*, *Active weapon parry*, *Sidestep dodge*, *Measure attack directions*, *Log level*.
+Opciones → Mods → **Competent AI**. Debe verse (en este orden): *Competent AI*, *Skill level*, *Skill shift*, *Chained strikes (katas)*, *Feints*, *Falling for feints / fatigue*, *Counter after dodge*, *Attack variety*, *Weapon rules*, *Skill tuning*, *Active weapon parry*, *Sidestep dodge*, *Measure attack directions*, *Extra info (on-screen text)*, *Log level*.
 
 | # | Prueba | Debe pasar | Log |
 |---|---|---|---|
 | M1 | Con NPCs peleando, pon *Competent AI* en OFF | En ≤ 1 s dejan de fintar/encadenar y vuelven al comportamiento del juego; en ON vuelven | `effective settings: enabled=False …` / `enabled=True …` |
 | M2 | *Skill level* = 1 Recruit y luego 4 Duelist con NPCs vivos | Los NPC cambian de nivel **sin respawn**: el Duelist es claramente más rápido, finta y encadena más | `skill level Veteran -> Recruit (menu)` por NPC |
 | M3 | *Skill level* = Auto, *Skill shift* +2 / −2 | Todo sube/baja de nivel | `skill level … (menu)` |
+| M5 | Activa *Extra info* con NPCs cerca | Aparece un panel de texto junto a la mano izquierda con lo que hacen (secuencias, fintas, etc.); con la opción apagada (por defecto) **no sale ningún texto** | — |
 | M4 | Apaga *Chained strikes* con una secuencia en curso | La secuencia se corta y no vuelven a verse encadenados | `kata ended … module off` |
 
 ## 2. Escenarios por arma
@@ -41,7 +42,7 @@ Para cada uno: lucha 1 contra 1 durante ~2 minutos, luego copia las líneas del 
 | B | NPC con **lanza** (`SpearBladed`) | **Ahora ataca** (antes, en cerebros de dificultad baja/media, no tenía ningún ataque): estocadas, estocada con paso y contra-estocada; riposte = estocada | `curation: … +N legitimate attack(s) the stock filter dropped only for difficulty`, `+CounterThrust (declared Swing, really Thrust)`, `synthesized=1 … +riposte CompetentRiposteThrust` |
 | C | NPC con **hacha larga/alabarda** (`AxeLongHalberd`) | Solo cortes (como de serie), sin estocadas | `curation: removed=…` (las estocadas que ya quitaba el juego no aparecen) |
 | D | NPC con **maza** (`MaceShortCommon`/`MaceLongMaul`) | Solo golpes, nunca estocadas | idem; clase `Mace` en la línea `weapon …` (Debug) |
-| E | NPC con **daga sin filo** (`DaggerSentaraStiletto`, `DaggerRaktaSai`) | **Nada de cortes**: solo estocadas (antes de v0.4.1 el mod les dejaba los cortes por una red de seguridad mal ordenada) | `curation: removed=… swing needs an edge or a blunt head (DaggerSentaraStiletto has neither)` |
+| E | NPC con **daga sin filo** (`DaggerSentaraStiletto`, `DaggerRaktaSai`) | **Nada de cortes**: solo estocadas (antes de v0.4.2 el mod les dejaba los cortes por una red de seguridad mal ordenada) | `curation: removed=… swing needs an edge or a blunt head (DaggerSentaraStiletto has neither)` |
 | F | NPC con **Viennoise sword** (`ViennoiseSword`) | Solo golpes (arma contundente), nunca estocadas | `thrust needs a point (ViennoiseSword has none)` |
 | G | **Arma modded** (cualquiera) | El NPC ataca igual que sin el mod (comportamiento conservador) | `weapon …[Unknown,None,… UNKNOWN]` en Debug; sin `removed` |
 | H | **Espada + escudo** | Empujes de escudo siguen funcionando; fintas y variedad en los cortes | `stance 'HumanMeleeShieldStance' …`; no debe haber `removed` de `Push*` |
@@ -83,7 +84,7 @@ Prueba con los mods que uses (animaciones de ataque/parada, otros de IA). Anota 
 ## Plantilla de reporte (copia y rellena)
 
 ```
-Versión del mod: 0.4.1     Versión del juego:
+Versión del mod: 0.4.2     Versión del juego:
 Mods instalados (orden de carga):
 Escenario(s) probado(s) (A–J / F1–F9 / M1–M4):
 Resultado:  OK / PARCIAL / FALLA

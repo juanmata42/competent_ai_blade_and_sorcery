@@ -41,6 +41,7 @@ namespace CompetentAI.Mod
             _kataRemaining = length - 1;
             _gate.Reset();
             Log.Info($"{_tag} kata planned: {length} strikes, opening with {atk.id} (profile {_profileName})");
+            Hud.Show(creature, $"[{_profileName}] sequence of {length} strikes: {atk.id}");
             return true;
         }
 
@@ -66,6 +67,7 @@ namespace CompetentAI.Mod
             _kataRemaining--;
             _kataExpectStep = true;
             Log.Info($"{_tag} kata step {_kataStep + 1}: {atk.id} -> {next.id}");
+            Hud.Show(creature, $"[{_profileName}] strike {_kataStep + 2}: {next.id}");
             // The damage window of this strike just ended, so its coroutine is finishing on its own: no need to stop it.
             ChainInto(atk, next, target.transform, true, false);
             if (_kataExpectStep)
@@ -101,7 +103,11 @@ namespace CompetentAI.Mod
 
         private void EndKata(string why)
         {
-            if (_kataActive) Log.Info($"{_tag} kata ended after {_kataStep + 1} strike(s): {why}");
+            if (_kataActive)
+            {
+                Log.Info($"{_tag} kata ended after {_kataStep + 1} strike(s): {why}");
+                if (why.StartsWith("interrupted")) Hud.Show(creature, $"[{_profileName}] breaks off the sequence to defend");
+            }
             _kataActive = false;
             _kataExpectStep = false;
             _kataRemaining = 0;
