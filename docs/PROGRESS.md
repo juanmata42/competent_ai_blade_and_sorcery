@@ -1,7 +1,7 @@
 # PROGRESS — Competent AI (Blade & Sorcery)
 
 ## Estado actual (2026-10-12)
-**Versión 0.1.0 construida, con tests unitarios en verde y documentada. NO probada en el juego** (no se puede ejecutar desde el entorno de desarrollo). Siguiente hito: que el usuario la pruebe con [TESTING.md](TESTING.md).
+**Versión 0.2.0 construida (114 tests en verde) y documentada. NO probada en el juego** (no se puede ejecutar desde el entorno de desarrollo). Siguiente hito: que el usuario la pruebe con [TESTING.md](TESTING.md).
 
 | Fase | Estado |
 |---|---|
@@ -18,14 +18,15 @@ Juego `D:\SteamLibrary\steamapps\common\Blade & Sorcery`, versión **1.3.1.26073
 1. **Solo PC**, solo código + JSON de configuración propio (decisión del usuario).
 2. Versión objetivo 1.3.1 (decisión del usuario). Sin SDK de Unity.
 3. El usuario no usa mods de IA; su prioridad: fintas y contraataques hechos y sufridos + ataque/defensa en 9 direcciones adaptadas al arma/escudo. Autorizó seguir sin paradas y commitear en `main`.
-4. **Nueve direcciones** = 8 cortes + estocada (interpretación mía; ver SUMMARY §3).
+4. **Nueve direcciones** = 8 cortes + estocada (**confirmado por el usuario**), también **avanzando** (en 8 direcciones además de en el sitio) y **encadenadas en secuencias tipo kata asumiendo que el primer golpe será parado, interrumpibles** (v0.2.0). Parar "igual": en el juego no hay clips de parada con paso; se modela como presión tras parar.
+4b. Menú in-game: interruptor general + **nivel de destreza** (Auto/1–4) en vivo (v0.2.0).
 5. Arquitectura: módulo propio **añadido** a `brain.instance.modules` (sin Harmony, sin sustituir módulos, sin catálogos). Una sola DLL (Core compilado dentro).
 6. El mod **mide** la dirección real de cada animación (no se fía de los nombres) y la persiste en `calibration.json`.
 7. Menú in-game solo puede apagar (efectivo = JSON AND menú).
 8. `OneHandIK` y `SideDodge` quedan **activados para Veteran/Duelist pero marcados experimentales** (apagables por separado).
 
 ## Preguntas abiertas (no bloquean)
-- ¿Confirmas la interpretación de las 9 direcciones?
+- ¿Cómo quieres que sea "parar avanzando"? (hoy: tras parar, se favorecen ataques con paso; no hay animaciones de parada con paso).
 - ¿Mods de animación/IA que quieras usar con esto? (hoy ninguno)
 - Resultados de las pruebas de TESTING.md (sobre todo F3 sufrir fintas, F7 IK, F8 esquiva lateral, F1 aspecto de las fintas).
 
