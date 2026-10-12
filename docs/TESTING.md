@@ -50,7 +50,7 @@ Para cada uno: lucha 1 contra 1 durante ~2 minutos, luego copia las líneas del 
 | F4 | **Fatiga** | Golpea al NPC repetidamente con golpes que él pare (4+ en 3 s) | Deja de parar ~1 s: queda abierto | `has parried too much …`, `overwhelmed: parry disabled` |
 | F5 | **Contra tras esquiva** | Ataca desde lejos para que esquive hacia atrás | Tras esquivar, a veces contraataca enseguida | `counter-attack after dodge` |
 | F6 | **Combos** | Deja que ataque sin pararlo | A veces encadena 2.º ataque sin pausa | `combo A -> B` |
-| F7 | **Parada con IK** (Veteran/Duelist) | Mira sus brazos al parar un golpe con una sola arma | La hoja sale a tu golpe; **sin brazos retorcidos ni temblor** | `one-hand parry IK enabled for …`; si falla: `could not enable weapon-placement IK` |
+| F7 | **Parada con IK** (Veteran/Duelist) | Mira sus brazos al parar un golpe con una sola arma | La hoja sale a tu golpe; **sin brazos retorcidos ni temblor** | `one-hand parry IK enabled for …`; si falla: `could not enable weapon-placement IK`. Efecto secundario esperado: su arma también **desvía hechizos** que le lances |
 | F8 | **Esquiva lateral** (Duelist) | Ataca con una estocada a un Duelist (`HumanVIP`) | Puede apartarse de lado (si la animación existe) | `tuning applied … side=True` |
 | F9 | **Direcciones medidas** | Tras ~20 ataques revisa `calibration.json` | Contiene una entrada por ataque con su dirección | `measured SwingTopToLeft: DownLeft (travel …)` |
 

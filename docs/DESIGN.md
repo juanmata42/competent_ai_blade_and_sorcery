@@ -100,7 +100,7 @@ Unitarias (94, `dotnet test`) para toda la lógica pura, incl. el fichero de con
 | El mod **no se ha ejecutado** en el juego | Toda la integración está por verificar; el compilador y el autochequeo solo garantizan que los miembros existen |
 | Etiquetas de dirección de los clips de serie | Inferidas por nombre para 5 ataques; el resto `Unknown` hasta medir. **NO VERIFICADO** que `RtL` viaje hacia la izquierda del atacante |
 | Cortes verticales puros (↓ ↑) | No existen como clip; la lógica los modela pero no pueden ejecutarse sin animaciones nuevas |
-| IK de una mano al parar | **NO VERIFICADO** visualmente; el juego lo tiene apagado en todos los Brains (puede ser por motivos estéticos) |
+| IK de una mano al parar | **NO VERIFICADO** visualmente; el juego lo tiene apagado en todos los Brains (puede ser por motivos estéticos). Efecto secundario conocido (leído en `Item.SetParryMagic`, que `EnableIK` activa): el arma del NPC pasa a **parar también hechizos** (colliders con tag `ParryMagic`) |
 | Esquiva lateral | **NO VERIFICADO** que las animaciones `DodgeType` Left/Right existan/queden bien |
 | Cancelación de un ataque en el aire (finta) | Usa la API pública `StopAttack/TriggerAttack`, igual que hace el juego en sus propios ripostes; el aspecto visual (corte brusco de la animación) **NO VERIFICADO** |
 | Armas a dos manos usan animaciones de espada a una mano | Limitación del juego (stance 1H), no del mod |
