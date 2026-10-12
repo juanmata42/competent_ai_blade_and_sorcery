@@ -70,7 +70,11 @@ namespace CompetentAI.Mod
                 _role = role;
                 if (role != SparringRole.None) Log.Info($"{_tag} practice role: {role}");
             }
-            if (_role == SparringRole.Attacker && Runtime.Cfg.Sparring.OneAttackerAtATime)
+            if (_role == SparringRole.Attacker && IsDemo)
+            {
+                if (_demoPhase != DemoPhase.Showing) _melee.meleeEnabled = false; // draw the weapon first, never fight on its own
+            }
+            else if (_role == SparringRole.Attacker && Runtime.Cfg.Sparring.OneAttackerAtATime)
             {
                 _melee.meleeMax = 1;
             }

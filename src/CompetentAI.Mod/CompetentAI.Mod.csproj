@@ -18,6 +18,7 @@
     <Reference Include="UnityEngine.CoreModule"><HintPath>$(GameManaged)\UnityEngine.CoreModule.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="UnityEngine.PhysicsModule"><HintPath>$(GameManaged)\UnityEngine.PhysicsModule.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="UnityEngine.AnimationModule"><HintPath>$(GameManaged)\UnityEngine.AnimationModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.VideoModule"><HintPath>$(GameManaged)\UnityEngine.VideoModule.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="UnityEngine.AIModule"><HintPath>$(GameManaged)\UnityEngine.AIModule.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="Unity.ResourceManager"><HintPath>$(GameManaged)\Unity.ResourceManager.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="Unity.Addressables"><HintPath>$(GameManaged)\Unity.Addressables.dll</HintPath><Private>false</Private></Reference>

@@ -55,7 +55,31 @@ namespace CompetentAI.Core
         /// <summary>The dummy appears this far (metres) from the aimed point towards you.</summary>
         public float DummyDistance = 0.5f;
 
-        /// <summary>Only one attacker attacks at a time, so you can practise against each weapon in turn.</summary>
+        /// <summary>
+        /// "Demo": each weapon NPC stands still facing you and performs EVERY attack of its stance one after another,
+        /// so you can watch each animation and practise parrying it. "Fight": they fight you like normal enemies.
+        /// </summary>
+        public string AttackerMode = "Demo";
+
+        /// <summary>Demo: seconds between one demonstrated attack and the next.</summary>
+        public float DemoPauseSeconds = 2.5f;
+
+        /// <summary>Demo: only demonstrators closer than this (metres) to you perform; walk up to the one you want to see.</summary>
+        public float DemoActiveRange = 5f;
+
+        /// <summary>Demo: show the name, kind and direction of each attack on screen (the log always lists them).</summary>
+        public bool DemoShowLabels = true;
+
+        /// <summary>Demo: also show the chain (follow-up) attacks.</summary>
+        public bool DemoIncludeChains = true;
+
+        /// <summary>Demo: also show the riposte attacks.</summary>
+        public bool DemoIncludeRipostes = true;
+
+        /// <summary>Demo: how long to wait for the NPC to draw its weapon before warning in the log.</summary>
+        public float DemoReadyTimeoutSeconds = 25f;
+
+        /// <summary>Fight mode only: only one attacker attacks at a time.</summary>
         public bool OneAttackerAtATime = true;
 
         /// <summary>Container of the parry-only dummy.</summary>
@@ -91,6 +115,10 @@ namespace CompetentAI.Core
             if (string.IsNullOrEmpty(AttackerBrainId)) AttackerBrainId = "HumanMedium";
             if (string.IsNullOrEmpty(DummyBrainId)) DummyBrainId = "HumanHard";
             if (string.IsNullOrEmpty(DummyContainerId)) DummyContainerId = "CompetentSpar_Dummy";
+            AttackerMode = string.Equals(AttackerMode, "Fight", System.StringComparison.OrdinalIgnoreCase) ? "Fight" : "Demo";
+            DemoPauseSeconds = System.Math.Max(0.5f, System.Math.Min(DemoPauseSeconds, 20f));
+            DemoActiveRange = System.Math.Max(1.5f, System.Math.Min(DemoActiveRange, 30f));
+            DemoReadyTimeoutSeconds = System.Math.Max(5f, System.Math.Min(DemoReadyTimeoutSeconds, 120f));
             if (Loadouts == null) Loadouts = DefaultLoadouts();
             Loadouts.RemoveAll(l => l == null || string.IsNullOrEmpty(l.ContainerId));
             if (Loadouts.Count > 24) Loadouts.RemoveRange(24, Loadouts.Count - 24);

@@ -82,6 +82,8 @@ namespace CompetentAI.Mod
                 _memory = new AttackMemory(Runtime.Cfg.Variety.Memory);
                 _tracker = new StrikeTracker();
 
+                _role = Runtime.RoleOf(creature);
+                if (_role != SparringRole.None) Log.Info($"{_tag} practice role: {_role}");
                 _stance.OnStanceChange += OnStanceChange;
                 Runtime.Register(creature, this);
                 _loaded = true;
@@ -178,6 +180,11 @@ namespace CompetentAI.Mod
                     _nextSync = now + 0.5f;
                     SyncTuning(false);
                     ApplyRole(); // after tuning: it rewrites some of the fields the role pins
+                }
+                if (IsDemo)
+                {
+                    DemoTick(now); // demonstrators only show their attacks; none of the fighting logic runs
+                    return;
                 }
                 if (!Active)
                 {

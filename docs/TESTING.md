@@ -15,7 +15,7 @@ Busca en `Player.log` tras llegar al menú principal:
 | Línea esperada | Significado |
 |---|---|
 | `[CompetentAI] API self-check OK (N members)` | Todas las piezas del juego que usa el mod existen |
-| `[CompetentAI] v0.3.0 loaded from '…\Mods\CompetentAI' (config found)` | El `ThunderScript` se instanció |
+| `[CompetentAI] v0.3.1 loaded from '…\Mods\CompetentAI' (config found)` | El `ThunderScript` se instanció |
 | `[CompetentAI] effective settings: enabled=True …` | Flags en vigor |
 | *(sin)* `[ModManager] … Incompatible with game version` ni errores `[ModManager][...][CompetentAI]` | Manifest correcto |
 
@@ -38,7 +38,10 @@ Abre la **rueda de hechizos** de una mano (la misma de fuego/gravedad/rayo). Deb
 | # | Prueba | Debe pasar | Log |
 |---|---|---|---|
 | S0 | Arranque | En el log del arranque no hay errores de `[Catalog]` ni de `[ModManager]` sobre `CompetentAI`; los hechizos y 14 contenedores se cargan | busca `CompetentSpar` y `Spar` |
-| S1 | Lanzar **Spar: weapons** | Aparecen 13 NPCs en círculo alrededor del punto apuntado, cada uno con un arma distinta (espada, daga, estoque sin filo, estoque, lanza, alabarda, hacha, maza, maul, espadón, bastón, espada y escudo, doble espada). Te atacan **de uno en uno** | `sparring: summoning 13 weapon attackers`; por cada uno `practice role: Attacker` |
+| S1 | Lanzar **Spar: weapons** | Aparecen 13 NPCs en círculo alrededor del punto apuntado, cada uno con un arma distinta (espada, daga, estoque sin filo, estoque, lanza, alabarda, hacha, maza, maul, espadón, bastón, espada y escudo, doble espada). Cada uno **desenfunda y se queda quieto mirándote** | `sparring: summoning 13 weapon NPCs (Demo mode)`; por cada uno `practice role: Attacker` y luego `demo ready: N attacks to show with …` |
+| S1b | **Acércate** (< 5 m) a uno de ellos | Empieza a **ejecutar uno tras otro todos sus ataques**, con ~2,5 s de pausa y la pose de guardia de cada uno; aparece una etiqueta (junto a la mano izquierda) con nombre, tipo y dirección; los de paso/zancada vuelven a su sitio. Ponte delante y **para** los que quieras | `demo: Sword 3/17: SwingTopToLeft - Swing to DownLeft (opening)`; `measured …: Left (travel 0.xx m)` |
+| S1c | Alejarte | Los que quedan a > 5 m dejan de demostrar y esperan | — |
+| S1d | Comprobar el repertorio | Un estoque sin filo / daga sin filo **no** muestra cortes (solo estocadas); una lanza muestra estocada, estocada con paso y contra-estocada; una maza no muestra estocadas | la lista `demo ready: N attacks` y las líneas `demo:` |
 | S2 | Volver a lanzarlo | Los 13 desaparecen; lanzar otra vez los trae de nuevo | `sparring: removed the previous weapon attackers` |
 | S3 | Lanzar **Spar: parry dummy** | Aparece un NPC con espada y escudo que se te acerca, se queda en guardia, **no ataca ni esquiva ni contraataca**, y para tus golpes (con vida casi infinita) | `sparring: summoning the parry dummy`; `practice role: Dummy` |
 | S4 | Cambia *Skill level* (1…4) con el muñeco delante | Cambia lo rápido que sigue tu arma con la guardia y lo bien que lee tus fintas (F3) | `skill level … (menu)` |
@@ -98,7 +101,7 @@ Prueba con los mods que uses (animaciones de ataque/parada, otros de IA). Anota 
 ## Plantilla de reporte (copia y rellena)
 
 ```
-Versión del mod: 0.3.0     Versión del juego:
+Versión del mod: 0.3.1     Versión del juego:
 Mods instalados (orden de carga):
 Escenario(s) probado(s) (A–J / F1–F9 / M1–M4):
 Resultado:  OK / PARCIAL / FALLA

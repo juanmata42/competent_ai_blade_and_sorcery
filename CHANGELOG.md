@@ -2,6 +2,11 @@
 
 Formato basado en *Keep a Changelog*. Versionado semántico (`ModVersion` del manifest).
 
+## [0.3.1] — 2026-10-12 (sin probar en el juego)
+
+### Cambiado
+- **Los NPCs con arma de `Spar: weapons` son ahora demostradores** (`Sparring.AttackerMode = "Demo"`, por defecto): desenfundan, se congelan en su sitio mirándote (se congela el árbol de comportamiento, como hace el juego con el miedo) y ejecutan **todos** los ataques de su stance —aperturas, seguimientos y ripostes, ordenados por tipo y dirección— con `DemoPauseSeconds` (2,5 s) entre uno y otro, la pose de guardia propia de cada ataque, y una etiqueta en pantalla (`Sword 4/17: SwingRightToLeft - Swing to Left (opening)`) del demostrador más cercano a ti. Solo actúan los que están a menos de `DemoActiveRange` (5 m): acércate al que quieras ver. Tras un ataque con paso vuelven a su sitio. De paso **miden la dirección y el avance de cada ataque** (alimentan `calibration.json`). El combate real sigue disponible con `"AttackerMode": "Fight"`.
+
 ## [0.3.0] — 2026-10-12 (sin probar en el juego)
 
 ### Añadido

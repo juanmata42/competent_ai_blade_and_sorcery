@@ -9,7 +9,7 @@ namespace CompetentAI.Mod
     /// <summary>Entry point. The game's mod manager instantiates this class by reflection.</summary>
     public class CompetentAIScript : ThunderScript
     {
-        public const string Version = "0.3.0";
+        public const string Version = "0.3.1";
 
         private float _nextScan;
         private float _nextRefresh;

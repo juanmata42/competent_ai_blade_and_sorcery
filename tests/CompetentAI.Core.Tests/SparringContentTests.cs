@@ -105,6 +105,17 @@ namespace CompetentAI.Core.Tests
             Assert.Equal("A", cfg.Sparring.Loadouts[0].ContainerId);
             var defaults = ConfigIO.Parse("{}", null);
             Assert.Equal(13, defaults.Sparring.Loadouts.Count);
+            Assert.Equal("Demo", defaults.Sparring.AttackerMode);
+        }
+
+        [Fact]
+        public void Attacker_mode_is_demo_unless_fight_is_asked_for_and_demo_timings_are_clamped()
+        {
+            Assert.Equal("Fight", ConfigIO.Parse("{ \"Sparring\": { \"AttackerMode\": \"fight\" } }", null).Sparring.AttackerMode);
+            Assert.Equal("Demo", ConfigIO.Parse("{ \"Sparring\": { \"AttackerMode\": \"nonsense\" } }", null).Sparring.AttackerMode);
+            var c = ConfigIO.Parse("{ \"Sparring\": { \"DemoPauseSeconds\": 0, \"DemoActiveRange\": 999 } }", null);
+            Assert.Equal(0.5f, c.Sparring.DemoPauseSeconds);
+            Assert.Equal(30f, c.Sparring.DemoActiveRange);
         }
     }
 }

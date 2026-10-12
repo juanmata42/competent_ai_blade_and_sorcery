@@ -52,7 +52,7 @@ namespace CompetentAI.Mod
             {
                 MeleeStanceData md = data as MeleeStanceData;
                 if (md == null || md == _curatedData) return;
-                if (!Runtime.Flags.Enabled) return;
+                if (!Runtime.Flags.Enabled && _role == SparringRole.None) return;
 
                 _wRight = WeaponInspector.Build(HeldOrChosen(Side.Right), Runtime.Cfg.Rules);
                 _wLeft = WeaponInspector.Build(HeldOrChosen(Side.Left), Runtime.Cfg.Rules);
@@ -172,17 +172,24 @@ namespace CompetentAI.Mod
 
         public void OnAttackStage(BrainModuleAttack.AttackStage stage, Creature targetCreature, Transform targetTransform)
         {
-            if (!_loaded || _disabled || !Runtime.Flags.Enabled) return;
+            if (!_loaded || _disabled || (!Runtime.Flags.Enabled && !IsDemo)) return;
             try
             {
                 AttackMotion atk = _melee.attack ?? _melee.lastAttack;
                 switch (stage)
                 {
-                    case BrainModuleAttack.AttackStage.WindUp: OnWindUp(atk, targetCreature); break;
+                    case BrainModuleAttack.AttackStage.WindUp:
+                        if (IsDemo)
+                        {
+                            _advStart = creature.transform.position; // demos still measure body advance
+                            _advTracking = true;
+                        }
+                        else OnWindUp(atk, targetCreature);
+                        break;
                     case BrainModuleAttack.AttackStage.Attack: CalibrationBegin(atk); break;
                     case BrainModuleAttack.AttackStage.FollowThrough: CalibrationEnd(atk); break;
                     case BrainModuleAttack.AttackStage.End:
-                        if (!_suppressEnd) OnAttackEnd(atk, targetCreature);
+                        if (!_suppressEnd && !IsDemo) OnAttackEnd(atk, targetCreature);
                         break;
                     case BrainModuleAttack.AttackStage.Cancel:
                         _calHasStart = false;

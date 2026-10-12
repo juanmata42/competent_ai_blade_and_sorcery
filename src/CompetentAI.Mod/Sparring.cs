@@ -99,6 +99,7 @@ namespace CompetentAI.Mod
             {
                 if (c == null) continue;
                 Runtime.Roles.Remove(c);
+                Runtime.Labels.Remove(c);
                 try { c.Despawn(); } catch (Exception ex) { Log.Warn("could not despawn a practice NPC: " + ex.Message); }
             }
             list.Clear();
@@ -177,7 +178,7 @@ namespace CompetentAI.Mod
                 data.SpawnAsync(pos, FaceYaw(pos, player.transform.position), null, true, null, c => OnSpawned(c, SparringRole.Attacker, Attackers, label));
                 spawned++;
             }
-            Log.Info($"sparring: summoning {spawned} weapon attackers around {center} (cast again to dismiss them)");
+            Log.Info($"sparring: summoning {spawned} weapon NPCs ({cfg.AttackerMode} mode) around {center} (cast again to dismiss them)");
         }
 
         private static void SpawnDummy(SparringConfig cfg, Creature player, Vector3 center)
@@ -195,6 +196,7 @@ namespace CompetentAI.Mod
         {
             if (c == null) return;
             Runtime.Roles[c] = role;
+            Runtime.Labels[c] = label;
             list.Add(c);
             Log.Debug_($"sparring: {role} '{label}' spawned as {c.name}");
         }

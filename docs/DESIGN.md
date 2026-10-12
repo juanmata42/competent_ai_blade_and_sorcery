@@ -87,7 +87,7 @@ Arquetipos: **Recruit / Soldier / Veteran / Duelist**, asignación por `creatura
 ### 4e. Hechizos de práctica (sparring)
 - **Mecanismo** (verificado en el código del juego): una clase `SpellSparring : SpellCastData` cuyos `Fire(true)` invocan a los NPCs; dos instancias por JSON (`Spells/*.json`, `$type` = nuestra DLL, que el cargador de mods resuelve porque las DLL se cargan antes que los catálogos). Como `allowSkill=true` + `isDefaultSkill=true`, `Creature.LoadDefaultSkills()` añade el hechizo al contenedor del jugador y `WheelMenuSpell` lo lista sin código adicional; `showInTree=false` lo oculta del árbol de habilidades.
 - **Aparición**: el punto apuntado se obtiene con un `RaycastAll` desde `magicSource` ignorando cuerpos y armas empuñadas, se ajusta al NavMesh, y se usa `CreatureData.Clone()` con `containerID`/`brainId`/`factionId`/`health` cambiados, que es **la misma técnica que usa el juego** para sus overrides de oleadas (`CreatureTable`). Los loadouts son contenedores JSON propios que solo referencian ids de objetos del juego en el holster `BackRight`/`BackLeft` (el mismo formato que `TribalWarrior`).
-- **Roles** (`SparringRole`, registro en `Runtime.Roles`): *Attacker* → `meleeMax=1` (atacan por turnos); *Dummy* → `meleeEnabled=false`, `dodgeEnabled=false`, `recoilNothingRiposteChance=(0,1)` (tras parar no hay recoil ni riposte) y se salta todo el código ofensivo del mod; conserva la defensa (lectura de fintas, fatiga, ajuste por nivel), de modo que sirve para probar tus fintas contra cada nivel. Los roles se re-aplican en cada sincronización porque el ajuste por arquetipo reescribe algunos de esos campos.
+- **Roles** (`SparringRole`, registro en `Runtime.Roles`): *Attacker* en modo **Demo** (por defecto) → `BrainModuleCompetent.Demo.cs`: mientras el árbol dibuja el arma (`meleeEnabled=false`) se espera a «arma en la mano + stance listo», entonces se congela el árbol (`BrainData.updateTree=false`, la misma técnica que usa el juego en `BrainModuleFear`), se mira al jugador con `BrainModuleMove.UpdateTurn` y se recorre la lista ordenada de ataques con `TriggerAttack` (saltándose el filtro de rango del juego), cambiando antes a la pose de guardia de cada ataque; tras los de avance se devuelve el cuerpo a su sitio con `Creature.Teleport`. La etiqueta usa `DisplayMessage`/`MessageData` (texto libre, descarte automático). En modo **Fight** → `meleeMax=1` (atacan por turnos); *Dummy* → `meleeEnabled=false`, `dodgeEnabled=false`, `recoilNothingRiposteChance=(0,1)` (tras parar no hay recoil ni riposte) y se salta todo el código ofensivo del mod; conserva la defensa (lectura de fintas, fatiga, ajuste por nivel), de modo que sirve para probar tus fintas contra cada nivel. Los roles se re-aplican en cada sincronización porque el ajuste por arquetipo reescribe algunos de esos campos.
 - **Límite conocido**: el muñeco camina hacia ti como cualquier hostil (el árbol de combate avanza hasta rango de melé) y se queda en guardia; no se queda clavado en el sitio.
 
 ## 5. Configuración
@@ -104,7 +104,7 @@ Estrategia y análisis por mod en [COMPATIBILITY.md](COMPATIBILITY.md). Resumen:
 - Excepciones: nunca en el camino normal; el limitador de log evita inundar.
 
 ## 8. Plan de pruebas
-Unitarias (119, `dotnet test`) para toda la lógica pura, incl. el fichero de configuración distribuido y el manifest. Manuales: [TESTING.md](TESTING.md).
+Unitarias (120, `dotnet test`) para toda la lógica pura, incl. el fichero de configuración distribuido y el manifest. Manuales: [TESTING.md](TESTING.md).
 
 ## 9. Limitaciones conocidas y puntos NO VERIFICADOS
 | Punto | Estado |
@@ -121,4 +121,5 @@ Unitarias (119, `dotnet test`) para toda la lógica pura, incl. el fichero de co
 | Ataques con avance por dirección | Solo existen clips con paso para Left, Right, DownLeft, DownRight y Thrust |
 | `ThunderScript.ScriptDisable/ScriptUnload` | Según el SDK no se invocan hoy; el mod limpia en `onLevelUnload` |
 | Compatibilidad con otros mods | Sin probar (ver COMPATIBILITY.md) |
+| Demostradores | **NO VERIFICADO**: congelar el árbol tras desenfundar, el orden/tiempos de la demostración, que `TriggerAttack` fuera del filtro de rango reproduzca bien cada clip, el `Teleport` de vuelta y el aspecto de la etiqueta en pantalla |
 | Hechizos de práctica | **NO VERIFICADO**: que el JSON del hechizo se cargue (`allowJsonMods`), que aparezca en la rueda, que `Fire` se dispare con el gatillo, que los contenedores/holsters equipen cada arma, y que `Creature.Despawn()` los retire. Cada paso deja una línea de log (`sparring: …`) |
