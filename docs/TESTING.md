@@ -7,7 +7,7 @@ El mod **no se ha podido ejecutar** durante su desarrollo: todo lo que sigue est
 2. En `CompetentAI.config.json` pon `"Logging": { "Level": "Debug" }` para las pruebas.
 3. Ten a mano `BladeAndSorcery_Data/StreamingAssets/Logs/Player.log` (el log del juego; el del arranque anterior es `Player-prev.log`). Todas las líneas del mod empiezan por `[CompetentAI]`.
 4. Para cada escenario, **sube el nivel de log solo si hace falta**; el limitador corta a 30 líneas/s.
-5. Entorno recomendado: Sandbox/arena con creaturas humanas. Para dar un arma concreta a un NPC: invoca criaturas cuya tabla lleve esa arma, o suelta el arma junto a un NPC desarmado (los Brains humanos tienen un árbol *EquipMelee* para recoger armas; **no verificado** que recoja armas sueltas del suelo).
+5. Entorno recomendado: Sandbox/arena con creaturas humanas. Para tener un NPC con cada arma usa los hechizos de práctica (§1c): `Spar: weapons` trae uno por tipo de arma.
 
 ## 1. Arranque (1 min) — *imprescindible*
 Busca en `Player.log` tras llegar al menú principal:
@@ -15,7 +15,7 @@ Busca en `Player.log` tras llegar al menú principal:
 | Línea esperada | Significado |
 |---|---|
 | `[CompetentAI] API self-check OK (N members)` | Todas las piezas del juego que usa el mod existen |
-| `[CompetentAI] v0.2.0 loaded from '…\Mods\CompetentAI' (config found)` | El `ThunderScript` se instanció |
+| `[CompetentAI] v0.3.0 loaded from '…\Mods\CompetentAI' (config found)` | El `ThunderScript` se instanció |
 | `[CompetentAI] effective settings: enabled=True …` | Flags en vigor |
 | *(sin)* `[ModManager] … Incompatible with game version` ni errores `[ModManager][...][CompetentAI]` | Manifest correcto |
 
@@ -31,6 +31,21 @@ Opciones → Mods → **Competent AI**. Debe verse (en este orden): *Competent A
 | M2 | *Skill level* = 1 Recruit y luego 4 Duelist con NPCs vivos | Los NPC cambian de nivel **sin respawn**: el Duelist es claramente más rápido, finta y encadena más | `skill level Veteran -> Recruit (menu)` por NPC |
 | M3 | *Skill level* = Auto, *Skill shift* +2 / −2 | Todo sube/baja de nivel | `skill level … (menu)` |
 | M4 | Apaga *Chained strikes* con una secuencia en curso | La secuencia se corta y no vuelven a verse encadenados | `kata ended … module off` |
+
+## 1c. Hechizos de práctica (5 min) — *para probar todo lo demás*
+Abre la **rueda de hechizos** de una mano (la misma de fuego/gravedad/rayo). Debes ver dos hechizos nuevos: **Spar: weapons** y **Spar: parry dummy**. Apunta al suelo a unos 5–8 m y lanza (gatillo).
+
+| # | Prueba | Debe pasar | Log |
+|---|---|---|---|
+| S0 | Arranque | En el log del arranque no hay errores de `[Catalog]` ni de `[ModManager]` sobre `CompetentAI`; los hechizos y 14 contenedores se cargan | busca `CompetentSpar` y `Spar` |
+| S1 | Lanzar **Spar: weapons** | Aparecen 13 NPCs en círculo alrededor del punto apuntado, cada uno con un arma distinta (espada, daga, estoque sin filo, estoque, lanza, alabarda, hacha, maza, maul, espadón, bastón, espada y escudo, doble espada). Te atacan **de uno en uno** | `sparring: summoning 13 weapon attackers`; por cada uno `practice role: Attacker` |
+| S2 | Volver a lanzarlo | Los 13 desaparecen; lanzar otra vez los trae de nuevo | `sparring: removed the previous weapon attackers` |
+| S3 | Lanzar **Spar: parry dummy** | Aparece un NPC con espada y escudo que se te acerca, se queda en guardia, **no ataca ni esquiva ni contraataca**, y para tus golpes (con vida casi infinita) | `sparring: summoning the parry dummy`; `practice role: Dummy` |
+| S4 | Cambia *Skill level* (1…4) con el muñeco delante | Cambia lo rápido que sigue tu arma con la guardia y lo bien que lee tus fintas (F3) | `skill level … (menu)` |
+| S5 | Con el mod en OFF, lanza el muñeco | Sigue sin atacar (el rol del muñeco no depende del interruptor) | — |
+
+Si un hechizo no aparece en la rueda, mira `Player.log`: `[Catalog] … CompetentAI … Version mismatch / Error loading json` indica un problema del JSON; pásamelo.
+Si aparecen los NPCs sin arma: `sparring: container '…' is not in the catalog` o el holster no se rellenó (pásame esa línea).
 
 ## 2. Escenarios por arma
 Para cada uno: lucha 1 contra 1 durante ~2 minutos, luego copia las líneas del log. Qué mirar:
@@ -83,7 +98,7 @@ Prueba con los mods que uses (animaciones de ataque/parada, otros de IA). Anota 
 ## Plantilla de reporte (copia y rellena)
 
 ```
-Versión del mod: 0.2.0     Versión del juego:
+Versión del mod: 0.3.0     Versión del juego:
 Mods instalados (orden de carga):
 Escenario(s) probado(s) (A–J / F1–F9 / M1–M4):
 Resultado:  OK / PARCIAL / FALLA

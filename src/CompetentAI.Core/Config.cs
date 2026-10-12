@@ -195,6 +195,7 @@ namespace CompetentAI.Core
         public VarietyConfig Variety = new VarietyConfig();
         public FeintConfig Feints = new FeintConfig();
         public KataConfig Katas = new KataConfig();
+        public SparringConfig Sparring = new SparringConfig();
         public DefenseConfig Defense = new DefenseConfig();
         public CalibrationConfig Calibration = new CalibrationConfig();
         public LoggingConfig Logging = new LoggingConfig();
@@ -208,6 +209,8 @@ namespace CompetentAI.Core
             Variety = Variety ?? new VarietyConfig();
             Feints = Feints ?? new FeintConfig();
             Katas = Katas ?? new KataConfig();
+            Sparring = Sparring ?? new SparringConfig();
+            Sparring.Normalize();
             Defense = Defense ?? new DefenseConfig();
             Calibration = Calibration ?? new CalibrationConfig();
             Logging = Logging ?? new LoggingConfig();

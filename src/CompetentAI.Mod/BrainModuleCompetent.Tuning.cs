@@ -58,6 +58,31 @@ namespace CompetentAI.Mod
             if (!f.Enabled || !f.Variety) RestoreWeights();
         }
 
+        /// <summary>
+        /// Practice NPCs of the sparring spells. Attackers take turns (only one attacks at a time); the parry dummy never
+        /// attacks, never dodges and never ripostes, it only parries. Re-asserted at every sync because tuning rewrites some of these fields.
+        /// </summary>
+        private void ApplyRole()
+        {
+            SparringRole role = Runtime.RoleOf(creature);
+            if (role != _role)
+            {
+                _role = role;
+                if (role != SparringRole.None) Log.Info($"{_tag} practice role: {role}");
+            }
+            if (_role == SparringRole.Attacker && Runtime.Cfg.Sparring.OneAttackerAtATime)
+            {
+                _melee.meleeMax = 1;
+            }
+            else if (_role == SparringRole.Dummy)
+            {
+                _melee.meleeEnabled = false;                              // no attacks of its own (also blocks the attack node)
+                _melee.recoilNothingRiposteChance = new Vector2(0f, 1f);  // after a parry: never recoil, never riposte
+                _defense.dodgeEnabled = false;                            // parries only
+                if (!_fatigueApplied) _defense.parryEnabled = true;
+            }
+        }
+
         private void CaptureOriginals()
         {
             if (_origCaptured) return;

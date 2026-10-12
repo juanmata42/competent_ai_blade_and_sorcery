@@ -9,7 +9,7 @@ namespace CompetentAI.Mod
     /// <summary>Entry point. The game's mod manager instantiates this class by reflection.</summary>
     public class CompetentAIScript : ThunderScript
     {
-        public const string Version = "0.2.0";
+        public const string Version = "0.3.0";
 
         private float _nextScan;
         private float _nextRefresh;
@@ -88,7 +88,7 @@ namespace CompetentAI.Mod
                 if (t >= _nextScan)
                 {
                     _nextScan = t + 0.5f;
-                    if (Runtime.Flags.Enabled) AttachToNewCreatures();
+                    if (Runtime.Flags.Enabled || Runtime.Roles.Count > 0) AttachToNewCreatures();
                 }
                 if (t >= _nextSave)
                 {
@@ -112,6 +112,7 @@ namespace CompetentAI.Mod
                 BrainData instance = c.brain.instance;
                 if (instance == null || instance.creature == null || instance.modules == null) continue;
                 if (instance.HasModule<BrainModuleCompetent>()) continue;
+                if (!Runtime.Flags.Enabled && Runtime.RoleOf(c) == SparringRole.None) continue; // mod off: only practice NPCs need us
                 if (!Runtime.Cfg.Assignment.ApplyToAllies && Player.currentCreature != null && !c.IsEnemy(Player.currentCreature)) continue;
                 try
                 {

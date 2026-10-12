@@ -2,6 +2,12 @@
 
 Formato basado en *Keep a Changelog*. Versionado semántico (`ModVersion` del manifest).
 
+## [0.3.0] — 2026-10-12 (sin probar en el juego)
+
+### Añadido
+- **Hechizos de práctica** en la rueda de hechizos (`Spar: weapons`, `Spar: parry dummy`): clase `SpellSparring` (hereda de `SpellCastData`) declarada por JSON como *habilidad por defecto*, de modo que el juego la añade sola al contenedor del jugador. Invocan, donde apuntas, 13 NPCs hostiles —uno por tipo de arma, con su loadout en un contenedor propio del mod y turno de ataque único (`meleeMax=1`)— o un **muñeco de paradas** (sin ataques, sin esquivas, sin contraataques; solo para) con 100 000 de vida. Volver a lanzar el hechizo retira el grupo. El nivel de destreza del menú también se aplica a ellos, así que sirven para comparar niveles.
+- Sección de configuración `Sparring` y 14 contenedores/2 hechizos generados (`tools/gen-sparring-content.py`), con 5 tests de coherencia (119 en total).
+
 ## [0.2.0] — 2026-10-12 (sin probar en el juego)
 
 ### Añadido

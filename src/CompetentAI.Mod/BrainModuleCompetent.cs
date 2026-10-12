@@ -38,6 +38,7 @@ namespace CompetentAI.Mod
         private int _faction;
         private float _noise;
         private int _appliedLevel = -1, _appliedShift = int.MinValue;
+        private SparringRole _role;
 
         public BrainData Instance => _instance;
         public string ProfileName => _profileName;
@@ -88,6 +89,7 @@ namespace CompetentAI.Mod
                 Log.Info($"attached to {_tag} brain={brainId} difficulty={_instance.difficulty} faction={faction} profile={_profileName}");
                 if (_stance.currentStanceData != null) OnStanceChange(_stance.stance, _stance.currentStanceData);
                 SyncTuning(true);
+                ApplyRole();
             }
             catch (Exception ex)
             {
@@ -175,6 +177,7 @@ namespace CompetentAI.Mod
                 {
                     _nextSync = now + 0.5f;
                     SyncTuning(false);
+                    ApplyRole(); // after tuning: it rewrites some of the fields the role pins
                 }
                 if (!Active)
                 {
@@ -213,6 +216,7 @@ namespace CompetentAI.Mod
                 if (_planned != null) ClearPlan();
                 return;
             }
+            if (_role == SparringRole.Dummy) return; // the parry dummy never attacks: no feints, sequences, counters or plans
             FeintTick(now, target);
             KataTick(now);
             CounterTick(now, target);
