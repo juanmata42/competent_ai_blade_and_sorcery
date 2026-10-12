@@ -1,0 +1,11 @@
+<Project>
+  <PropertyGroup>
+    <!-- Folder with the game's managed assemblies. Override with env var BAS_MANAGED or -p:GameManaged=... -->
+    <GameManaged Condition="'$(GameManaged)' == '' And '$(BAS_MANAGED)' != ''">$(BAS_MANAGED)</GameManaged>
+    <GameManaged Condition="'$(GameManaged)' == ''">D:\SteamLibrary\steamapps\common\Blade &amp; Sorcery\BladeAndSorcery_Data\Managed</GameManaged>
+    <LangVersion>9.0</LangVersion>
+    <Nullable>disable</Nullable>
+    <Deterministic>true</Deterministic>
+    <Version>0.1.0</Version>
+  </PropertyGroup>
+</Project>

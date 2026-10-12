@@ -1,0 +1,13 @@
+# Local-only data (decompiled game code, extracted game JSON, scratch). NEVER commit game code.
+.local/
+# Build output
+bin/
+obj/
+dist/
+*.user
+.vs/
+# Game assemblies must never be committed
+*.dll
+!tools/**/*.dll
+# Runtime-generated mod data
+**/calibration.json
