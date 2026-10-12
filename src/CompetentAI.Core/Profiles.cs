@@ -26,7 +26,9 @@ namespace CompetentAI.Core
         public float AnimSpeedMul = 1f;
         /// <summary>Actively place a single one-handed weapon in the strike's path (stock: disabled).</summary>
         public bool OneHandIK = false;
+        /// <summary>How strongly (0-1) the hand position follows the strike when OneHandIK is on.</summary>
         public float OneHandIKPos = 0.1f;
+        /// <summary>How strongly (0-1) the hand rotation follows the strike when OneHandIK is on.</summary>
         public float OneHandIKRot = 0.5f;
         /// <summary>Allow the director to pick sidesteps (needs the game's side-dodge animations).</summary>
         public bool SideDodge = false;
@@ -52,6 +54,7 @@ namespace CompetentAI.Core
         public float FooledDuration = 0.4f;
         /// <summary>Parries within FatigueWindow after which the creature gets overwhelmed.</summary>
         public int MaxParriesBeforeFatigue = 4;
+        /// <summary>Length in seconds of the window in which parries are counted for fatigue.</summary>
         public float FatigueWindow = 3f;
         /// <summary>Seconds the creature cannot parry once overwhelmed.</summary>
         public float FatigueDuration = 0.8f;

@@ -87,6 +87,7 @@ namespace CompetentAI.Core
 
     public sealed class RulesConfig
     {
+        /// <summary>Master switch of the weapon rules (false = stock attack lists, only class weights stay neutral).</summary>
         public bool Enabled = true;
 
         /// <summary>When a weapon's damagers cannot be read (modded items), keep the game's stock attack list.</summary>
@@ -131,6 +132,7 @@ namespace CompetentAI.Core
         public float MinWindowSeconds = 0.28f;
         /// <summary>The abort happens at this fraction (min,max) of the time before the damage window.</summary>
         public float CancelFractionMin = 0.35f;
+        /// <summary>Upper end of the abort fraction (see CancelFractionMin).</summary>
         public float CancelFractionMax = 0.7f;
         /// <summary>Extra decay of the feint chance per consecutive feint.</summary>
         public float ChainDecay = 0.5f;
@@ -144,6 +146,7 @@ namespace CompetentAI.Core
     {
         /// <summary>A change of strike direction larger than this (degrees) within ReversalWindow counts as a feint.</summary>
         public float ReversalAngle = 75f;
+        /// <summary>Time window (seconds) in which the direction change is measured.</summary>
         public float ReversalWindow = 0.35f;
         /// <summary>Strike speed (m/s) below which direction changes are ignored.</summary>
         public float MinStrikeSpeed = 1.2f;
@@ -161,7 +164,9 @@ namespace CompetentAI.Core
 
     public sealed class CalibrationConfig
     {
+        /// <summary>Measurements needed before a measured direction replaces the name-based guess.</summary>
         public int MinSamples = 3;
+        /// <summary>Fraction of the measurements that must agree on the same direction (0.5-1).</summary>
         public float Agreement = 0.7f;
         /// <summary>File (inside the mod folder) where measured directions are stored between sessions.</summary>
         public string File = "calibration.json";
@@ -170,6 +175,7 @@ namespace CompetentAI.Core
     public sealed class LoggingConfig
     {
         [JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
+        /// <summary>Off, Error, Warn, Info, Debug or Trace. Use Debug when reporting a problem. The in-game log level option can only make it more verbose.</summary>
         public LogLevel Level = LogLevel.Info;
         /// <summary>Log one line per attack decision (very chatty; use Debug level or higher).</summary>
         public bool LogAttacks = true;

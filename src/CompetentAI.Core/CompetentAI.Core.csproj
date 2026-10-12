@@ -3,7 +3,8 @@
     <TargetFramework>netstandard2.1</TargetFramework>
     <RootNamespace>CompetentAI.Core</RootNamespace>
     <AssemblyName>CompetentAI.Core</AssemblyName>
-    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591;1587</NoWarn>
   </PropertyGroup>
   <ItemGroup Condition="Exists('$(GameManaged)\Newtonsoft.Json.dll')">
     <Reference Include="Newtonsoft.Json">
