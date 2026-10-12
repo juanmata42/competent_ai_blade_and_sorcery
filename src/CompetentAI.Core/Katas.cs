@@ -35,11 +35,17 @@ namespace CompetentAI.Core
 
         /// <summary>Keep chaining after a strike lands on the body (pressure); false = stop, like the stock chain rules.</summary>
         public bool ChainAfterBodyHit = true;
+
+        /// <summary>Weight multiplier for a thrust right after a cut (the cut is expected to be parried, the thrust slips past it).</summary>
+        public float CutToThrustBias = 2.2f;
+
+        /// <summary>Weight multiplier for a thrust right after a thrust (several straight thrusts in a row are predictable).</summary>
+        public float ThrustRepeatFactor = 0.6f;
     }
 
     public static class KataPlanner
     {
-        public static bool ShouldStart(SkillProfile p, IRandom rng) => p.ComboChance > 0f && rng.Value() < p.ComboChance;
+        public static bool ShouldStart(SkillProfile p, IRandom rng, float bonus = 0f) => p.ComboChance > 0f && rng.Value() < Math.Min(0.95f, p.ComboChance + bonus);
 
         /// <summary>Total number of strikes of a new sequence (at least 2).</summary>
         public static int PlanLength(SkillProfile p, KataConfig cfg, IRandom rng)
@@ -67,6 +73,11 @@ namespace CompetentAI.Core
                 float weight = c.Weight;
                 if (previous != null && previous.Direction != CutDirection.Unknown && c.Direction != CutDirection.Unknown)
                     weight *= 0.6f + 0.4f * (Directions.Steps(previous.Direction, c.Direction) / 4f);
+                if (previous != null && c.Kind == AttackKind.Thrust)
+                {
+                    if (previous.Kind == AttackKind.Swing) weight *= cfg.CutToThrustBias;
+                    else if (previous.Kind == AttackKind.Thrust) weight *= cfg.ThrustRepeatFactor;
+                }
                 if (c.IsChain) weight *= cfg.PrefersChains;
                 if (c.IsAuthoredFollowUp) weight *= cfg.AuthoredFollowUpBonus;
                 if (c.Advances && pressing) weight *= cfg.AdvanceBias * p.PressureBias;

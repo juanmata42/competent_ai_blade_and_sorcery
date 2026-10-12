@@ -217,6 +217,7 @@ namespace CompetentAI.Mod
             }
             AggressionTick(now);
             if (!_brain.isAttacking) DisarmRecoilGuard();
+            MutationTick(now);
             FeintTick(now, target);
             KataTick(now);
             CounterTick(now, target);
@@ -227,6 +228,8 @@ namespace CompetentAI.Mod
         {
             ClearPlan();
             ClearFeint();
+            _mutationArmed = false;
+            _mutationNext = null;
             EndKata("brain stopped");
             _counterUntil = 0f;
         }

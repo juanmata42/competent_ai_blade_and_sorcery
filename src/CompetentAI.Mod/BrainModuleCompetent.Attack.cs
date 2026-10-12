@@ -116,6 +116,7 @@ namespace CompetentAI.Mod
             if (openers.Count == 0) return;
             float distance = DistanceTo(target);
             string poseId = _stance.currentPose != null ? _stance.currentPose.id : "";
+            ReadGuard(target);
 
             _candScratch.Clear();
             for (int i = 0; i < openers.Count; i++)
@@ -128,7 +129,7 @@ namespace CompetentAI.Mod
                 if (m.sourceIdle != "Any" && m.sourceIdle != poseId) w *= 0.35f; // switching pose costs ~0.8 s
                 if (mi.Candidate.Advances && now - _lastParryTime < Runtime.Cfg.Katas.PressureWindow)
                     w *= Runtime.Cfg.Katas.AdvanceBias * _profile.PressureBias; // just parried: press the advantage
-                mi.Candidate.Weight = w;
+                mi.Candidate.Weight = w * GuardFactor(mi.Candidate);
                 _candScratch.Add(mi.Candidate);
             }
             if (_candScratch.Count == 0) return;
@@ -174,7 +175,7 @@ namespace CompetentAI.Mod
             }
 
             MotionInfo pi = _infos[planned];
-            Log.Attack($"{_tag} plan -> {planned.id} [{pi.Candidate.Kind}/{pi.Candidate.Direction}] among {_candScratch.Count} at {distance:0.00} m, pose={poseId}");
+            Log.Attack($"{_tag} plan -> {planned.id} [{pi.Candidate.Kind}/{pi.Candidate.Direction}] among {_candScratch.Count} at {distance:0.00} m, pose={poseId}{(_guard.Sources > 0 ? " guard=" + _guard + " openest=" + _guard.MostOpen() : "")}");
         }
 
         // ---------------------------------------------------------------- attack lifecycle (called by the script's event dispatcher)
@@ -215,7 +216,6 @@ namespace CompetentAI.Mod
             if (atk == _planned) _planned = null; // consumed; next plan after this attack
             RestoreWeights();
 
-            ArmRecoilGuard(_kataExpectStep);
             float window = atk.GetRealStartTime(_melee.GetBrainSpeedMultiplier(atk.attackSide));
             bool forced = _pendingDouble;
             _pendingDouble = false;
@@ -263,6 +263,8 @@ namespace CompetentAI.Mod
                 if (_feintFor == atk) _kataActive = false; // a feint and a sequence do not mix
                 else KataWindUp(atk, target, out _);
             }
+            ArmMutation(mi);
+            ArmRecoilGuard(followUp);
             Log.Attack($"{_tag} windup {atk.id} [{mi.Candidate.Kind}/{mi.Candidate.Direction}/{mi.DirectionSource}{(mi.Candidate.Advances ? "/advancing" : "")}] window={window:0.00}s{feintInfo}");
         }
 
@@ -270,6 +272,7 @@ namespace CompetentAI.Mod
         {
             _calHasStart = false;
             if (_feintFor == atk) return; // a feint is handled by FeintTick
+            if (_ignoreEndFor == atk && Time.time < _ignoreEndUntil) { _ignoreEndFor = null; return; } // replaced by a thrust
             _feintsInRow = 0;
 
             KataAttackEnd(atk, target);
@@ -368,6 +371,7 @@ namespace CompetentAI.Mod
         private AttackMotion ChooseRedirect(MotionInfo first, Creature target)
         {
             float distance = DistanceTo(target);
+            ReadGuard(target);
             _candScratch.Clear();
             foreach (AttackMotion m in _curatedData.openingAttacks)
             {
@@ -376,7 +380,7 @@ namespace CompetentAI.Mod
                 if (mi.Candidate.IsLunge && !Runtime.Cfg.Feints.AllowOnLunges) continue;
                 if (m.animationClip == null || !RangeFits(m, distance)) continue;
                 StanceCurator.RefreshDirection(mi, Runtime.Dirs);
-                mi.Candidate.Weight = mi.BaseWeight * VarietyScorer.Freshness(mi.Candidate, _memory, Runtime.Cfg.Variety, _profile.VarietyStrength);
+                mi.Candidate.Weight = mi.BaseWeight * VarietyScorer.Freshness(mi.Candidate, _memory, Runtime.Cfg.Variety, _profile.VarietyStrength) * GuardFactor(mi.Candidate);
                 _candScratch.Add(mi.Candidate);
             }
             if (_candScratch.Count == 0) return null;

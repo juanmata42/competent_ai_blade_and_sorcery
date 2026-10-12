@@ -9,7 +9,7 @@ namespace CompetentAI.Mod
     /// <summary>The module switches actually in force: JSON config AND in-game menu.</summary>
     internal sealed class EffectiveFlags
     {
-        public bool Enabled, ProfileTuning, WeaponRules, Variety, Feints, Combos, DefenseReading, CounterAfterDodge,
+        public bool Enabled, ProfileTuning, WeaponRules, Variety, Feints, Combos, DefenseReading, CounterAfterDodge, Openings,
             OneHandIK, SideDodge, Calibration, ExtraInfo;
         public int LevelShift;
         /// <summary>0 = Auto (per brain); 1..4 forces Ladder[level-1] for every NPC.</summary>
@@ -18,7 +18,7 @@ namespace CompetentAI.Mod
         public bool SameAs(EffectiveFlags o) =>
             o != null && Enabled == o.Enabled && ProfileTuning == o.ProfileTuning && WeaponRules == o.WeaponRules &&
             Variety == o.Variety && Feints == o.Feints && Combos == o.Combos && DefenseReading == o.DefenseReading &&
-            CounterAfterDodge == o.CounterAfterDodge && OneHandIK == o.OneHandIK && SideDodge == o.SideDodge &&
+            CounterAfterDodge == o.CounterAfterDodge && Openings == o.Openings && OneHandIK == o.OneHandIK && SideDodge == o.SideDodge &&
             Calibration == o.Calibration && LevelShift == o.LevelShift && SkillLevel == o.SkillLevel && ExtraInfo == o.ExtraInfo;
     }
 
@@ -65,6 +65,7 @@ namespace CompetentAI.Mod
                 Combos = m.Combos && ModOptions.Combos,
                 DefenseReading = m.DefenseReading && ModOptions.DefenseReading,
                 CounterAfterDodge = m.CounterAfterDodge && ModOptions.CounterAfterDodge,
+                Openings = m.Openings && ModOptions.Openings,
                 OneHandIK = m.OneHandIK && ModOptions.OneHandIK,
                 SideDodge = m.SideDodge && ModOptions.SideDodge,
                 Calibration = m.Calibration && ModOptions.Calibration,
@@ -86,7 +87,7 @@ namespace CompetentAI.Mod
 
         public static string Describe(EffectiveFlags f) =>
             $"enabled={f.Enabled} tuning={f.ProfileTuning} rules={f.WeaponRules} variety={f.Variety} feints={f.Feints} combos={f.Combos} " +
-            $"defenseReading={f.DefenseReading} counterAfterDodge={f.CounterAfterDodge} ik={f.OneHandIK} sideDodge={f.SideDodge} " +
+            $"defenseReading={f.DefenseReading} counterAfterDodge={f.CounterAfterDodge} openings={f.Openings} ik={f.OneHandIK} sideDodge={f.SideDodge} " +
             $"calibration={f.Calibration} extraInfo={f.ExtraInfo} shift={f.LevelShift} skillLevel={(f.SkillLevel == 0 ? "auto" : f.SkillLevel.ToString())}";
 
         private static DirectionCalibration LoadCalibration()

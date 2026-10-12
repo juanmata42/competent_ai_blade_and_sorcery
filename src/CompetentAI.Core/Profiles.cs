@@ -52,6 +52,13 @@ namespace CompetentAI.Core
         /// <summary>Chance to react with a dodge to a straight thrust.</summary>
         public float ThrustDodgeChance = 0f;
 
+        /// <summary>0-1: how strongly attacks are steered to the zones where the opponent's guard is open.</summary>
+        public float OpeningSeeking = 0.5f;
+        /// <summary>Chance that a cut which gets parried turns into a thrust (the classic cut-then-thrust).</summary>
+        public float ParryMutationChance = 0.2f;
+        /// <summary>Extra chance to start a sequence when the opponent's guard is tight (no gap to aim at).</summary>
+        public float TightGuardComboBoost = 0.1f;
+
         /// <summary>Scales melee animation speed.</summary>
         public float AnimSpeedMul = 1f;
         /// <summary>Actively place a single one-handed weapon in the strike's path (stock: disabled).</summary>
@@ -112,6 +119,7 @@ namespace CompetentAI.Core
                 ["Recruit"] = new SkillProfile
                 {
                     ParryAdjustSpeedMul = 0.85f, AboutToBeHitMul = 0.9f, DodgeChanceMul = 0.8f,
+                    OpeningSeeking = 0.2f, ParryMutationChance = 0.05f, TightGuardComboBoost = 0.0f,
                     RangeDeltaMul = 1.0f, AttackDespiteDanger = 0.0f, ParryRecoilResist = 0.0f, DodgeCooldownMul = 1.0f, LegDodgeChance = 0.05f, ThrustDodgeChance = 0.10f,
                     RiposteChanceShift = -0.05f, RiposteDelayMul = 1.25f, AttackIntervalMul = 1.2f, AnimSpeedMul = 0.95f,
                     VarietyStrength = 0.5f, FeintChance = 0.00f, DoubleFeintChance = 0f, ComboChance = 0.25f, ComboMaxLength = 3, ComboCommitment = 0.9f, InterruptDanger = 0.8f, PressureBias = 1.0f,
@@ -122,6 +130,7 @@ namespace CompetentAI.Core
                 {
                     ParryAdjustSpeedMul = 1.1f, AboutToBeHitMul = 1.0f, DodgeChanceMul = 1.0f,
                     AttackIntervalCapMin = 1.0f, AttackIntervalCapMax = 1.6f, ParryAdjustSpeedFloor = 7f,
+                    OpeningSeeking = 0.5f, ParryMutationChance = 0.2f, TightGuardComboBoost = 0.1f,
                     RangeDeltaMul = 1.3f, AttackDespiteDanger = 0.2f, ParryRecoilResist = 0.25f, DodgeCooldownMul = 0.9f, LegDodgeChance = 0.25f, ThrustDodgeChance = 0.30f,
                     RiposteChanceShift = 0.0f, RiposteDelayMul = 1.0f, AttackIntervalMul = 1.0f, AnimSpeedMul = 1.0f,
                     VarietyStrength = 0.8f, FeintChance = 0.08f, DoubleFeintChance = 0.0f, ComboChance = 0.40f, ComboMaxLength = 4, ComboCommitment = 0.6f, InterruptDanger = 0.6f, PressureBias = 1.3f,
@@ -132,6 +141,7 @@ namespace CompetentAI.Core
                 {
                     ParryAdjustSpeedMul = 1.4f, AboutToBeHitMul = 1.15f, DodgeChanceMul = 1.2f,
                     AttackIntervalCapMin = 0.3f, AttackIntervalCapMax = 0.8f, ParryAdjustSpeedFloor = 9f,
+                    OpeningSeeking = 0.8f, ParryMutationChance = 0.35f, TightGuardComboBoost = 0.2f,
                     RangeDeltaMul = 1.7f, AttackDespiteDanger = 0.5f, ParryRecoilResist = 0.5f, DodgeCooldownMul = 0.6f, LegDodgeChance = 0.45f, ThrustDodgeChance = 0.50f, SideDodge = true,
                     RiposteChanceShift = 0.05f, RiposteDelayMul = 0.85f, AttackIntervalMul = 0.85f, AnimSpeedMul = 1.05f,
                     OneHandIK = true, OneHandIKPos = 0.15f, OneHandIKRot = 0.6f,
@@ -143,6 +153,7 @@ namespace CompetentAI.Core
                 {
                     ParryAdjustSpeedMul = 1.7f, AboutToBeHitMul = 1.3f, DodgeChanceMul = 1.4f,
                     AttackIntervalCapMin = 0.0f, AttackIntervalCapMax = 0.35f, ParryAdjustSpeedFloor = 11f,
+                    OpeningSeeking = 1.0f, ParryMutationChance = 0.5f, TightGuardComboBoost = 0.3f,
                     RangeDeltaMul = 2.0f, AttackDespiteDanger = 0.7f, ParryRecoilResist = 0.75f, DodgeCooldownMul = 0.4f, LegDodgeChance = 0.65f, ThrustDodgeChance = 0.70f,
                     RiposteChanceShift = 0.1f, RiposteDelayMul = 0.7f, AttackIntervalMul = 0.7f, AnimSpeedMul = 1.1f,
                     OneHandIK = true, OneHandIKPos = 0.25f, OneHandIKRot = 0.75f, SideDodge = true,
@@ -166,6 +177,9 @@ namespace CompetentAI.Core
             AttackIntervalCapMax = Clamp(AttackIntervalCapMax, 0f, 20f);
             ParryAdjustSpeedFloor = Clamp(ParryAdjustSpeedFloor, 0f, 40f);
             RangeDeltaMul = Clamp(RangeDeltaMul, 0.5f, 3f);
+            OpeningSeeking = Clamp(OpeningSeeking, 0f, 1f);
+            ParryMutationChance = Clamp(ParryMutationChance, 0f, 1f);
+            TightGuardComboBoost = Clamp(TightGuardComboBoost, 0f, 0.9f);
             AttackDespiteDanger = Clamp(AttackDespiteDanger, 0f, 1f);
             ParryRecoilResist = Clamp(ParryRecoilResist, 0f, 1f);
             DodgeCooldownMul = Clamp(DodgeCooldownMul, 0.1f, 3f);

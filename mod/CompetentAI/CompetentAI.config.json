@@ -14,6 +14,7 @@
     "Combos": true,             // NPCs chain a second attack after the first
     "DefenseReading": true,     // NPCs can fall for your feints / get overwhelmed by sustained parrying
     "CounterAfterDodge": true,  // NPCs counter-attack right after a dodge
+    "Openings": true,           // NPCs aim at the gaps in your guard; a parried cut turns into a thrust
     "OneHandIK": true,          // EXPERIMENTAL: Veteran/Duelist place their weapon in your strike's path
     "SideDodge": true,          // EXPERIMENTAL: Duelists may sidestep (needs the game's side-dodge animations)
     "Calibration": true,        // measure the real direction of each attack animation (calibration.json)

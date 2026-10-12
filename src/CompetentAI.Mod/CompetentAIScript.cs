@@ -9,7 +9,7 @@ namespace CompetentAI.Mod
     /// <summary>Entry point. The game's mod manager instantiates this class by reflection.</summary>
     public class CompetentAIScript : ThunderScript
     {
-        public const string Version = "0.5.0";
+        public const string Version = "0.6.0";
 
         private float _nextScan;
         private float _nextRefresh;
@@ -136,6 +136,7 @@ namespace CompetentAI.Mod
 
         private static void OnCreatureAttackParry(Creature parried, Item parriedItem, Creature parrying, Item parryingItem, CollisionInstance collision)
         {
+            if (parried != null && Runtime.Modules.TryGetValue(parried, out BrainModuleCompetent attacker)) attacker.OnAttackParried(parrying);
             if (parrying == null) return;
             if (Runtime.Modules.TryGetValue(parrying, out BrainModuleCompetent m)) m.OnParrySuccess();
         }

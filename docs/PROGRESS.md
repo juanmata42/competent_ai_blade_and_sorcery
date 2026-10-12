@@ -1,7 +1,7 @@
 # PROGRESS — Competent AI (Blade & Sorcery)
 
 ## Estado actual (2026-10-12)
-**Versión 0.5.0 (129 tests en verde) y documentada. Probada parcialmente por el usuario (0.4.x); los cambios de 0.5.0 aún no** (no se puede ejecutar desde el entorno de desarrollo). Siguiente hito: que el usuario la pruebe con [TESTING.md](TESTING.md).
+**Versión 0.6.0 (138 tests en verde) y documentada. Probada parcialmente por el usuario (0.4.x); los cambios de 0.5.0 y 0.6.0 aún no** (no se puede ejecutar desde el entorno de desarrollo). Siguiente hito: que el usuario la pruebe con [TESTING.md](TESTING.md).
 
 | Fase | Estado |
 |---|---|
@@ -51,6 +51,9 @@ Un subagente revisó el código de integración contra el del juego (12 hallazgo
 - Feedback: mejor al parar, pero «atacan al tanteo», dudan, rodean, no encadenan 3–5 golpes; las piernas y las estocadas rectas siempre entran.
 - Causas halladas en el log y el código del juego: el retroceso por parada (`recoilMinWeaponSpeed` + `StopAttack`) corta la secuencia; mi regla «golpe al cuerpo termina la kata»; los perfiles solo multiplicaban los tiempos del cerebro (un `HumanEasy` forzado a Duelist seguía lento); huecos entre ventanas de distancia; `defensePreferenceChance` del nodo `AttackMelee`; sin reacción a golpes bajos/estocadas.
 - 0.5.0 los aborda (ver CHANGELOG) y añade el log `HIT …` para diagnosticar qué golpes entran. **Pendiente de validar en el juego.**
+
+## 0.6.0 — petición del usuario: golpear donde hay huecos y cortar→estocada
+- Pedido: «la IA debería atacar donde vea huecos; si no hay, atacar por un lado para entrar por el opuesto; y la técnica de dar un corte sabiendo que lo van a parar y cambiar a estocada». Hecho como módulo `Openings` (ver CHANGELOG). **Pendiente de validar en el juego**; el evento de parada del juego se dispara antes del retroceso (BrainModuleMelee), por eso la mutación puede proteger el golpe.
 
 ## Registro de cambios de proceso
 - 2026-10-12: Fase 0 → Fase 1 → … → 4 ejecutadas de una tacada por mandato del usuario. Revisión independiente del código de integración hecha por un subagente (ver sección anterior).

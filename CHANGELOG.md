@@ -2,6 +2,15 @@
 
 Formato basado en *Keep a Changelog*. Versionado semántico (`ModVersion` del manifest).
 
+## [0.6.0] — 2026-10-12
+
+### Añadido
+- **Atacar a los huecos** (módulo `Openings`, opción de menú «Aim at openings»). El NPC mide dónde están tu(s) arma(s) y escudo en la rejilla de 9 zonas delante de ti (punta del arma; el escudo cubre su celda y todas las vecinas, el arma su celda y las vecinas a medias) y multiplica el peso de cada ataque por `1 + Gain × OpeningSeeking × hueco` de la zona donde acaba el golpe. Se aplica a: la elección del siguiente ataque (director de variedad), el destino de una finta y cada paso de una secuencia. Como la medida es en vivo, **tras parar su primer golpe tu arma queda de ese lado y el siguiente va al opuesto** («atacar por un lado para entrar rápido por el otro»).
+- **Guardia cerrada**: si no hay ningún hueco (`TightGuardThreshold`; p. ej. escudo + arma) sube la probabilidad de iniciar una secuencia (`TightGuardComboBoost`: Recruit 0 → Duelist +0,3).
+- **Corte → estocada al ser parado** (la «mutación»): al iniciar un corte se decide (`ParryMutationChance` Recruit 5 % / Soldier 20 % / Veteran 35 % / Duelist 50 %) si, en caso de ser parado, se transforma en una estocada. El evento de parada del juego se dispara justo antes del retroceso, así que ese golpe queda protegido contra el retroceso; la estocada (elegida entre las del arma, con tolerancia de distancia `MutationRangeTolerance`) entra como siguiente paso de una secuencia corta, con enfriamiento `MutationCooldown` 2,5 s. Además, dentro de cualquier secuencia, tras un corte pesa `CutToThrustBias` (×2,2) elegir una estocada y tras una estocada otra estocada pesa ×0,6 (`ThrustRepeatFactor`).
+- Perfiles: `OpeningSeeking` 0,2 / 0,5 / 0,8 / 1,0; `ParryMutationChance`; `TightGuardComboBoost`. Config: sección `Openings` y `Modules.Openings`.
+- Log: en el plan de ataque aparece `guard=##./+../... openest=<zona>` (arriba→abajo, izquierda→derecha del defensor: `#` cubierto, `+` parcial, `.` abierto); `parried: cut X turns into thrust Y`; en cada paso de secuencia la guardia que vio.
+
 ## [0.5.0] — 2026-10-12
 
 ### Cambiado (a raíz de «atacan al tanteo, dudan, giran en círculo; los golpes a las piernas y las estocadas rectas siempre entran»)

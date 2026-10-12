@@ -62,41 +62,46 @@ namespace CompetentAI.Mod
 
         [ModOptionCategory(Cat, 1)]
         [ModOptionOrder(8)]
+        [ModOption("Aim at openings", "NPCs attack the zones where your guard is open and turn a parried cut into a thrust.")]
+        public static bool Openings = true;
+
+        [ModOptionCategory(Cat, 1)]
+        [ModOptionOrder(9)]
         [ModOption("Attack variety", "Attack memory and stance steering so NPCs stop repeating the same two attacks.")]
         public static bool Variety = true;
 
         [ModOptionCategory(Cat, 1)]
-        [ModOptionOrder(9)]
+        [ModOptionOrder(10)]
         [ModOption("Weapon rules", "No cuts with edgeless weapons, no thrusts with blunt ones. Applies when an NPC next draws a weapon or spawns.")]
         public static bool WeaponRules = true;
 
         [ModOptionCategory(Cat, 1)]
-        [ModOptionOrder(10)]
+        [ModOptionOrder(11)]
         [ModOption("Skill tuning", "Reaction speed, riposte chance and attack tempo per skill level.")]
         public static bool ProfileTuning = true;
 
         [ModOptionCategory(Cat, 1)]
-        [ModOptionOrder(11)]
+        [ModOptionOrder(12)]
         [ModOption("Active weapon parry (experimental)", "Veteran/Duelist place their weapon in your strike's path (and also deflect spells). Turn off if arms look odd.")]
         public static bool OneHandIK = true;
 
         [ModOptionCategory(Cat, 1)]
-        [ModOptionOrder(12)]
+        [ModOptionOrder(13)]
         [ModOption("Sidestep dodge (experimental)", "Duelists may sidestep. Needs the game's side-dodge animations.")]
         public static bool SideDodge = true;
 
         [ModOptionCategory(Cat, 1)]
-        [ModOptionOrder(13)]
+        [ModOptionOrder(14)]
         [ModOption("Measure attack directions", "Learns the real direction of every attack animation (written to calibration.json).")]
         public static bool Calibration = true;
 
         [ModOptionCategory(Cat, 1)]
-        [ModOptionOrder(14)]
+        [ModOptionOrder(15)]
         [ModOption("Extra info (on-screen text)", "Shows a text panel by your left hand with what nearby NPCs are doing: sequences, feints, reading/falling for your feints, counters. Off by default.")]
         public static bool ExtraInfo = false;
 
         [ModOptionCategory(Cat, 1)]
-        [ModOptionOrder(15)]
+        [ModOptionOrder(16)]
         [ModOptionIntValues(0, 5, 1)]
         [ModOption("Log level", "0 Off, 1 Error, 2 Warn, 3 Info, 4 Debug, 5 Trace. Use 4 when reporting problems.")]
         public static int LogLevelOption = 3;

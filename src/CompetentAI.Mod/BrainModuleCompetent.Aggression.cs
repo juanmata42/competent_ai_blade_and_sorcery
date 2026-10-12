@@ -27,7 +27,7 @@ namespace CompetentAI.Mod
         private void ArmRecoilGuard(bool followUp)
         {
             if (!_origCaptured) return;
-            bool resist = followUp || _kataActive || _rng.Value() < _profile.ParryRecoilResist;
+            bool resist = followUp || _kataActive || _mutationArmed || _rng.Value() < _profile.ParryRecoilResist;
             _melee.recoilMinWeaponSpeed = resist ? NoRecoil : _orig.recoilMin;
         }
 

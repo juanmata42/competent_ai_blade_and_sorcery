@@ -12,6 +12,7 @@
 | `Modules.Combos` | true | true/false | NPCs chain several strikes into an interruptible sequence (kata), assuming the first will be parried. |
 | `Modules.DefenseReading` | true | true/false | NPCs can fall for (or read) the target's feints and get overwhelmed by sustained parrying. |
 | `Modules.CounterAfterDodge` | true | true/false | NPCs counter-attack right after a successful dodge. |
+| `Modules.Openings` | true | true/false | NPCs aim at the gaps in your guard, and turn a parried cut into a thrust. |
 | `Modules.OneHandIK` | true | true/false | Allow archetypes to enable active weapon placement while parrying (stock: off). |
 | `Modules.SideDodge` | true | true/false | Allow archetypes to use sidesteps (needs the game's side-dodge animations). |
 | `Modules.Calibration` | true | true/false | Measure the real direction of every attack animation at runtime. |
@@ -118,6 +119,9 @@ Each profile has the same fields. Defaults per archetype:
 | `DodgeCooldownMul` | Scales the dodge cooldown (stock 0.5-1 s): <1 = can dodge again sooner (several thrusts in a row). | 0.1 … 3 | 1 | 0.9 | 0.6 | 0.4 |
 | `LegDodgeChance` | Chance to react with a dodge to a strike aimed at the legs. | 0 … 1 | 0.05 | 0.25 | 0.45 | 0.65 |
 | `ThrustDodgeChance` | Chance to react with a dodge to a straight thrust. | 0 … 1 | 0.1 | 0.3 | 0.5 | 0.7 |
+| `OpeningSeeking` | 0-1: how strongly attacks are steered to the zones where the opponent's guard is open. | 0 … 1 | 0.2 | 0.5 | 0.8 | 1 |
+| `ParryMutationChance` | Chance that a cut which gets parried turns into a thrust (the classic cut-then-thrust). | 0 … 1 | 0.05 | 0.2 | 0.35 | 0.5 |
+| `TightGuardComboBoost` | Extra chance to start a sequence when the opponent's guard is tight (no gap to aim at). | 0 … 0.9 | 0 | 0.1 | 0.2 | 0.3 |
 | `AnimSpeedMul` | Scales melee animation speed. | 0.6 … 1.6 | 0.95 | 1 | 1.05 | 1.1 |
 | `OneHandIK` | Actively place a single one-handed weapon in the strike's path (stock: disabled). | true/false | false | false | true | true |
 | `OneHandIKPos` | How strongly (0-1) the hand position follows the strike when OneHandIK is on. | 0 … 0.6 | 0.1 | 0.1 | 0.15 | 0.25 |

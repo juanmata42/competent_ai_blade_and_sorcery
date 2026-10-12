@@ -68,6 +68,8 @@ Para cada uno: lucha 1 contra 1 durante ~2 minutos, luego copia las líneas del 
 | F9 | **Direcciones medidas** | Tras ~20 ataques revisa `calibration.json` | Contiene una entrada por ataque con su dirección | `measured SwingTopToLeft: DownLeft (travel …)` |
 | F10 | **Presión (0.5.0)** | *Skill level* 3 y luego 4; quédate a 2–3 m sin atacar, luego para sus golpes | Sin pausas largas ni círculos: ataca a los ~0,3–1,6 s; las secuencias **no se rompen al parar el primer golpe**; solo se cortan si tú te vuelves peligroso | `attack-despite-danger active on N attack node(s)`; `kata ended … completed` con 3–6 golpes |
 | F11 | **Piernas y estocadas (0.5.0)** | Nivel 3–4: golpea a las piernas y haz 3–4 estocadas rectas seguidas | A veces esquiva o para; los golpes que entren quedan en el log | `reactive dodge (leg strike / thrust …)`, `HIT <daño> (<tipo>) at height 0.xx` (altura 0 = pies, 1 = ojos) |
+| F12 | **Ataca a los huecos (0.6.0)** | Nivel 3–4. Quédate con la espada alta a un lado y observa varios ataques; luego baja el arma | Los cortes acaban en el lado/altura donde NO está tu arma; si la bajas, atacan alto | `plan -> X … guard=#../.../... openest=High-Left`, `kata step … (guard …)` |
+| F13 | **Corte → estocada (0.6.0)** | Nivel 3–4, arma con estocadas (espada, lanza): para varios cortes seguidos | A veces, justo al pararlo, el NPC cambia a una estocada sin reiniciar la animación | `parried: cut X turns into thrust Y`; `parried on X: no thrust available …` si el arma no tiene |
 
 Para F9 compara: ¿coincide la dirección medida con lo que ves? (En el log, `stance … openers=[id:Kind/Direction/source]`: `source` es `name` (inferida del nombre), `measured` o `unknown`.)
 

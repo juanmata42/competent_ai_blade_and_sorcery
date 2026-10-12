@@ -34,6 +34,8 @@ namespace CompetentAI.Core
         public bool DefenseReading = true;
         /// <summary>NPCs counter-attack right after a successful dodge.</summary>
         public bool CounterAfterDodge = true;
+        /// <summary>NPCs aim at the gaps in your guard, and turn a parried cut into a thrust.</summary>
+        public bool Openings = true;
         /// <summary>Allow archetypes to enable active weapon placement while parrying (stock: off).</summary>
         public bool OneHandIK = true;
         /// <summary>Allow archetypes to use sidesteps (needs the game's side-dodge animations).</summary>
@@ -214,6 +216,7 @@ namespace CompetentAI.Core
         public VarietyConfig Variety = new VarietyConfig();
         public FeintConfig Feints = new FeintConfig();
         public KataConfig Katas = new KataConfig();
+        public OpeningConfig Openings = new OpeningConfig();
         public DefenseConfig Defense = new DefenseConfig();
         public CalibrationConfig Calibration = new CalibrationConfig();
         public HudConfig Hud = new HudConfig();
@@ -228,6 +231,13 @@ namespace CompetentAI.Core
             Variety = Variety ?? new VarietyConfig();
             Feints = Feints ?? new FeintConfig();
             Katas = Katas ?? new KataConfig();
+            Openings = Openings ?? new OpeningConfig();
+            Openings.NeighbourCover = Clamp(Openings.NeighbourCover, 0f, 1f);
+            Openings.ShieldCover = Clamp(Openings.ShieldCover, 0f, 1f);
+            Openings.Gain = Clamp(Openings.Gain, 0f, 10f);
+            Openings.TightGuardThreshold = Clamp(Openings.TightGuardThreshold, 0f, 1f);
+            Openings.MutationRangeTolerance = Clamp(Openings.MutationRangeTolerance, 0f, 1.5f);
+            Openings.MutationCooldown = Clamp(Openings.MutationCooldown, 0f, 30f);
             Defense = Defense ?? new DefenseConfig();
             Calibration = Calibration ?? new CalibrationConfig();
             Logging = Logging ?? new LoggingConfig();

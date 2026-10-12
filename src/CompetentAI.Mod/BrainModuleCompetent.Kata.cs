@@ -34,7 +34,9 @@ namespace CompetentAI.Mod
             // A fresh attack that is not one of our follow-ups: maybe start a new sequence.
             _kataActive = false;
             if (!Runtime.Flags.Combos || target == null || target.state != Creature.State.Alive) return false;
-            if (!KataPlanner.ShouldStart(_profile, _rng)) return false;
+            ReadGuard(target);
+            float bonus = Runtime.Flags.Openings ? OpeningPlanner.ComboBonus(_guard, _profile, Runtime.Cfg.Openings) : 0f;
+            if (!KataPlanner.ShouldStart(_profile, _rng, bonus)) return false;
             int length = KataPlanner.PlanLength(_profile, Runtime.Cfg.Katas, _rng);
             _kataActive = true;
             _kataStep = 0;
@@ -66,7 +68,7 @@ namespace CompetentAI.Mod
 
             _kataRemaining--;
             _kataExpectStep = true;
-            Log.Info($"{_tag} kata step {_kataStep + 1}: {atk.id} -> {next.id}");
+            Log.Info($"{_tag} kata step {_kataStep + 1}: {atk.id} -> {next.id}{(_guard.Sources > 0 ? " (guard " + _guard + ")" : "")}");
             Hud.Show(creature, $"[{_profileName}] strike {_kataStep + 2}: {next.id}");
             // The damage window of this strike just ended, so its coroutine is finishing on its own: no need to stop it.
             ChainInto(atk, next, target.transform, true, false);
@@ -120,6 +122,7 @@ namespace CompetentAI.Mod
             float tol = Runtime.Cfg.Katas.StepRangeTolerance;
             string poseId = _stance.currentPose != null ? _stance.currentPose.id : "";
             TryInfo(prevMotion, out MotionInfo prevInfo);
+            ReadGuard(target); // the opponent has just parried: its weapon shows where it is NOT
 
             // The follow-up the game's authors paired with the previous attack, if any.
             MeleeStanceData md = _stance.currentStanceData as MeleeStanceData;
@@ -133,7 +136,7 @@ namespace CompetentAI.Mod
                 StanceCurator.RefreshDirection(mi, Runtime.Dirs);
                 mi.Candidate.IsChain = true;
                 mi.Candidate.IsAuthoredFollowUp = authored != null && authored.id == m.id;
-                mi.Candidate.Weight = mi.BaseWeight;
+                mi.Candidate.Weight = mi.BaseWeight * GuardFactor(mi.Candidate);
                 _candScratch.Add(mi.Candidate);
             }
             foreach (AttackMotion m in _curatedData.openingAttacks)
@@ -144,7 +147,7 @@ namespace CompetentAI.Mod
                 StanceCurator.RefreshDirection(mi, Runtime.Dirs);
                 mi.Candidate.IsChain = false;
                 mi.Candidate.IsAuthoredFollowUp = false;
-                mi.Candidate.Weight = mi.BaseWeight;
+                mi.Candidate.Weight = mi.BaseWeight * GuardFactor(mi.Candidate);
                 _candScratch.Add(mi.Candidate);
             }
 
