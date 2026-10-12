@@ -55,5 +55,8 @@ Un subagente revisó el código de integración contra el del juego (12 hallazgo
 ## 0.6.0 — petición del usuario: golpear donde hay huecos y cortar→estocada
 - Pedido: «la IA debería atacar donde vea huecos; si no hay, atacar por un lado para entrar por el opuesto; y la técnica de dar un corte sabiendo que lo van a parar y cambiar a estocada». Hecho como módulo `Openings` (ver CHANGELOG). **Pendiente de validar en el juego**; el evento de parada del juego se dispara antes del retroceso (BrainModuleMelee), por eso la mutación puede proteger el golpe.
 
+## Planificado, no desarrollado
+- [PLAN-pattern-dummy.md](PLAN-pattern-dummy.md): maniquí que ataca en patrones (práctica de series) y, como ampliación, sitio de entrenamiento con maniquí de armadura ajustable y medidor de daño. Esperan decisiones del usuario (sección «Preguntas abiertas»).
+
 ## Registro de cambios de proceso
 - 2026-10-12: Fase 0 → Fase 1 → … → 4 ejecutadas de una tacada por mandato del usuario. Revisión independiente del código de integración hecha por un subagente (ver sección anterior).
